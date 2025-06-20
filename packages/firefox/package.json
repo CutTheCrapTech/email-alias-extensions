@@ -1,0 +1,14 @@
+{
+  "name": "@email-alias-extensions/firefox",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/popup.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build",
+    "watch": "tsc --build --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

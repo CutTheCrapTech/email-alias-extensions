@@ -1,0 +1,40 @@
+{
+  "name": "email-alias-extensions-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=@email-alias-extensions/chrome && npm run build --workspace=@email-alias-extensions/firefox",
+    "watch": "npm run watch --workspace=@email-alias-extensions/chrome & npm run watch --workspace=@email-alias-extensions/firefox",
+    "lint": "eslint . --ext .ts,.js",
+    "format": "prettier --write .",
+    "test": "npm test --workspaces"
+  },
+  "devDependencies": {
+    "@types/firefox-webext-browser": "^120.0.4",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.12.12",
+    "@types/webextension-polyfill": "^0.10.7",
+    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "@typescript-eslint/parser": "^7.8.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.2.5",
+    "jest": "^30.0.2",
+    "@types/jest": "^30.0.0",
+    "ts-jest": "^29.1.1",
+    "jest-environment-jsdom": "^29.6.4"
+  },
+  "release": {
+    "branches": ["main"],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/github"
+    ]
+  }
+}
