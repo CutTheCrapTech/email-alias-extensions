@@ -7,18 +7,6 @@
   "scripts": {
     "build": "tsc --build",
     "watch": "tsc --build --watch",
-    "test": "jest"
-  },
-  "devDependencies": {
-    "typescript": "^5.8.3"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "jsdom",
-    "globals": {
-      "ts-jest": {
-        "useESM": true
-      }
-    }
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
   }
 }

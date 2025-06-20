@@ -6,4 +6,4 @@
     "allowJs": false
   },
   "include": ["src/**/*.ts"]
-} 
+}

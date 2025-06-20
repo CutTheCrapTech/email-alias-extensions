@@ -16,16 +16,13 @@
     "email-alias-core": "^1.0.1"
   },
   "scripts": {
-    "test": "jest"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "jest": {
-    "preset": "ts-jest",
+    "preset": "ts-jest/presets/default-esm",
     "testEnvironment": "node",
-    "globals": {
-      "ts-jest": {
-        "useESM": true
-      }
-    },
-    "transformIgnorePatterns": ["/node_modules/(?!email-alias-core)/"]
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    }
   }
 }

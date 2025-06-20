@@ -1,17 +1,11 @@
 // This script handles the UI logic for the extension's popup.
-// It depends on functions from the 'common' package, which should be loaded
-// before this script and exposed on a global object (e.g., `window.ext`).
+// It is designed to be testable by exporting its initialization logic.
 
-declare global {
-  interface Window {
-    ext: {
-      generateEmailAlias: (prefix: string) => Promise<string>;
-      saveToken: (token: string) => Promise<void>;
-    };
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
+/**
+ * Initializes the popup's UI and event listeners.
+ * Exported to allow for direct invocation in a testing environment.
+ */
+export function initializePopup() {
   const prefixInput = document.getElementById('prefix') as HTMLInputElement;
   const generateBtn = document.getElementById(
     'generate-btn'
@@ -21,24 +15,25 @@ document.addEventListener('DOMContentLoaded', () => {
   ) as HTMLElement;
   const aliasResult = document.getElementById('alias-result') as HTMLElement;
   const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement;
-
   const tokenInput = document.getElementById('token') as HTMLInputElement;
   const saveTokenBtn = document.getElementById(
     'save-token-btn'
   ) as HTMLButtonElement;
   const statusDiv = document.getElementById('status') as HTMLElement;
 
+  // The core functionality is expected to be on the window object.
   const core = window.ext;
 
+  // Gracefully handle if the core logic fails to load.
   if (!core || !core.generateEmailAlias || !core.saveToken) {
     displayStatus(
       'Error: Core logic is missing. The extension might be broken.',
       true
     );
-    prefixInput.disabled = true;
-    generateBtn.disabled = true;
-    tokenInput.disabled = true;
-    saveTokenBtn.disabled = true;
+    if (prefixInput) prefixInput.disabled = true;
+    if (generateBtn) generateBtn.disabled = true;
+    if (tokenInput) tokenInput.disabled = true;
+    if (saveTokenBtn) saveTokenBtn.disabled = true;
     return;
   }
 
@@ -96,11 +91,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function displayStatus(message: string, isError = false) {
     statusDiv.textContent = message;
-    statusDiv.className = isError ? 'error' : '';
+    statusDiv.className = isError ? 'error' : 'success';
   }
 
   function clearStatus() {
     statusDiv.textContent = '';
     statusDiv.className = '';
   }
-});
+}
+
+// Attach the initialization logic to the DOMContentLoaded event for the browser.
+document.addEventListener('DOMContentLoaded', initializePopup);

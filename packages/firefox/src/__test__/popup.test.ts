@@ -10,7 +10,7 @@ import {
   beforeEach,
   afterEach,
 } from '@jest/globals';
-import { initializePopup } from '../popup.js';
+import { initializePopup } from '../popup';
 
 // Helper to wait for the next tick of the event loop, allowing promises to resolve.
 const flushPromises = () => new Promise(process.nextTick);
@@ -28,7 +28,7 @@ describe('Popup UI', () => {
   let generateBtn: HTMLButtonElement;
   let resultContainer: HTMLElement;
   let aliasResult: HTMLElement;
-  // copyBtn was removed as it was unused
+  // copyBtn was removed as it was unused.
   let tokenInput: HTMLInputElement;
   let saveTokenBtn: HTMLButtonElement;
   let statusDiv: HTMLElement;

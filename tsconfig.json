@@ -6,6 +6,7 @@
     "target": "es2022",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "isolatedModules": true,
 
     /* Module Resolution */
     "module": "NodeNext",

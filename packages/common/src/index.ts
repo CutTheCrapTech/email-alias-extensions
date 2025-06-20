@@ -19,7 +19,7 @@ async function storeToken(token: string): Promise<void> {
  * Retrieves the stored token.
  * @returns The stored token, or null if not found.
  */
-async function getToken(): Promise<string | null> {
+export async function getToken(): Promise<string | null> {
   const result = await browser.storage.local.get(EMAIL_ALIAS_TOKEN_KEY);
   return result[EMAIL_ALIAS_TOKEN_KEY] || null;
 }
@@ -36,7 +36,7 @@ async function storeDomain(domain: string): Promise<void> {
  * Retrieves the stored domain.
  * @returns The stored domain, or null if not found.
  */
-async function getDomain(): Promise<string | null> {
+export async function getDomain(): Promise<string | null> {
   const result = await browser.storage.local.get(DOMAIN_KEY);
   return result[DOMAIN_KEY] || null;
 }
@@ -90,8 +90,3 @@ export async function saveDomain(domain: string): Promise<void> {
   }
   await storeDomain(domain);
 }
-
-/**
- * Gets the currently stored domain.
- */
-export { getDomain };

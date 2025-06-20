@@ -6,9 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "watch": "tsc --build --watch"
-  },
-  "devDependencies": {
-    "typescript": "^5.8.3"
+    "watch": "tsc --build --watch",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
   }
 }
