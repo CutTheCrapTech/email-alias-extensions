@@ -10,7 +10,7 @@ import {
   beforeEach,
   afterEach,
 } from '@jest/globals';
-import { initializePopup } from '../popup';
+import { initializePopup } from '../popup.js';
 
 // Helper to wait for the next tick of the event loop, allowing promises to resolve.
 const flushPromises = () => new Promise(process.nextTick);
