@@ -3,84 +3,46 @@
   <head>
     <title>Email Alias Generator</title>
     <meta charset="UTF-8" />
-    <style>
-      body {
-        font-family: sans-serif;
-        width: 300px;
-        padding: 10px;
-      }
-      h1 {
-        font-size: 1.2em;
-        margin-top: 0;
-      }
-      .section {
-        margin-bottom: 15px;
-      }
-      label {
-        display: block;
-        margin-bottom: 5px;
-      }
-      input[type='text'],
-      input[type='password'] {
-        width: 95%;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-      }
-      button {
-        padding: 8px 12px;
-        border: none;
-        background-color: #007bff;
-        color: white;
-        border-radius: 3px;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #0056b3;
-      }
-      #result-container {
-        margin-top: 10px;
-        padding: 10px;
-        background-color: #f0f0f0;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        word-wrap: break-word;
-        display: none; /* Hidden by default */
-      }
-      #status {
-        margin-top: 10px;
-        color: green;
-      }
-      .error {
-        color: red;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <h1>Email Alias Generator</h1>
 
     <div class="section">
-      <label for="prefix">Prefix (e.g., website.com):</label>
-      <input type="text" id="prefix" placeholder="Enter prefix" />
-      <button id="generate-btn">Generate</button>
+      <label for="label-input">
+        Label
+        <span
+          class="info-icon"
+          title="A general category for this alias, like 'work', 'shopping', or 'news'. This helps you organize aliases."
+          >i</span
+        >
+      </label>
+      <input type="text" id="label-input" placeholder="e.g., shopping" />
     </div>
 
-    <div id="result-container">
-      <strong>Generated Alias:</strong>
-      <pre id="alias-result"></pre>
-      <button id="copy-btn">Copy</button>
-    </div>
-
-    <hr />
-
-    <h2>Settings</h2>
     <div class="section">
-      <label for="token">Secret Token:</label>
-      <input type="password" id="token" placeholder="Enter your secret token" />
-      <button id="save-token-btn">Save</button>
+      <label for="source-input">
+        Source
+        <span
+          class="info-icon"
+          title="The specific website or service this alias is for, e.g., 'amazon', 'netflix', or 'github'."
+          >i</span
+        >
+      </label>
+      <input type="text" id="source-input" placeholder="e.g., amazon" />
     </div>
 
-    <div id="status"></div>
+    <button id="generate-btn">Generate</button>
+
+    <div id="result-container" class="hidden">
+      <label>Generated Alias:</label>
+      <div class="result-box">
+        <span id="alias-result"></span>
+        <button id="copy-btn">Copy</button>
+      </div>
+    </div>
+
+    <div id="error-container" class="error hidden"></div>
 
     <script type="module" src="popup.js"></script>
   </body>

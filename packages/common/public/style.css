@@ -1,0 +1,158 @@
+/* --- Color Palette using CSS Custom Properties --- */
+:root {
+  /* --- Light Theme (Default) --- */
+  --background-body: #f9f9f9;
+  --background-result: #e9ecef;
+  --background-success: #d4edda;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555;
+  --text-heading: #333;
+  --text-success: #155724;
+  --text-error: #d93025;
+  --border-color: #ccc;
+  --border-result: #dee2e6;
+  --border-success: #c3e6cb;
+  --button-bg: #007bff;
+  --button-bg-hover: #0056b3;
+  --button-text: #fff;
+  --info-icon-bg: #aaa;
+  --info-icon-text: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* --- Dark Theme Overrides --- */
+  :root {
+    --background-body: #212529;
+    --background-result: #343a40;
+    --background-success: #14361f;
+    --text-primary: #f8f9fa;
+    --text-secondary: #adb5bd;
+    --text-heading: #ffffff;
+    --text-success: #8cffb4;
+    --text-error: #ff8a80;
+    --border-color: #495057;
+    --border-result: #495057;
+    --border-success: #195c31;
+    --button-bg: #0d6efd;
+    --button-bg-hover: #0b5ed7;
+    --button-text: #fff;
+    --info-icon-bg: #6c757d;
+    --info-icon-text: #fff;
+  }
+}
+
+/* --- Base Styles --- */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  width: 320px;
+  padding: 16px;
+  color: var(--text-primary);
+  background-color: var(--background-body);
+}
+
+h1 {
+  font-size: 1.5em;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--text-heading);
+}
+
+.section {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+input[type='text'],
+input[type='password'] {
+  width: calc(100% - 12px); /* Account for padding */
+  padding: 8px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1em;
+  background-color: var(--background-body);
+  color: var(--text-primary);
+}
+
+button {
+  display: inline-block;
+  padding: 10px 16px;
+  border: none;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 500;
+  text-align: center;
+  transition: background-color 0.2s ease-in-out;
+}
+
+button:hover {
+  background-color: var(--button-bg-hover);
+}
+
+button.full-width {
+  width: 100%;
+}
+
+.result-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding: 10px;
+  background-color: var(--background-result);
+  border: 1px solid var(--border-result);
+  border-radius: 4px;
+  word-wrap: break-word;
+}
+
+#alias-result {
+  flex-grow: 1;
+  margin-right: 10px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.error {
+  color: var(--text-error);
+  margin-top: 10px;
+}
+
+#status-message {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: var(--background-success);
+  color: var(--text-success);
+  border: 1px solid var(--border-success);
+}
+
+.info-icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: bold;
+  font-style: italic;
+  font-family: 'Georgia', serif;
+  color: var(--info-icon-text);
+  background-color: var(--info-icon-bg);
+  border-radius: 50%;
+  cursor: help;
+  margin-left: 6px;
+  position: relative;
+  top: -1px;
+}

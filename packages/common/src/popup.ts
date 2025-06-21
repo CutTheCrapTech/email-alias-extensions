@@ -1,116 +1,113 @@
-// This script handles the UI logic for the extension's popup.
-// It is designed to be testable by exporting its initialization logic.
+import { generateEmailAlias, ApiError } from './api';
 
-// This script depends on functions from the 'common' package, which should be loaded
-// before this script and exposed on a global object (e.g., `window.ext`).
+document.addEventListener('DOMContentLoaded', () => {
+  // --- DOM Element Selection ---
+  const labelInput = document.getElementById('label-input') as HTMLInputElement | null;
+  const sourceInput = document.getElementById('source-input') as HTMLInputElement | null;
+  const generateBtn = document.getElementById('generate-btn') as HTMLButtonElement | null;
+  const resultContainer = document.getElementById('result-container') as HTMLDivElement | null;
+  const aliasResultSpan = document.getElementById('alias-result') as HTMLSpanElement | null;
+  const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement | null;
+  const errorContainer = document.getElementById('error-container') as HTMLDivElement | null;
 
-declare global {
-  interface Window {
-    ext: {
-      generateEmailAlias: (prefix: string) => Promise<string>;
-      saveToken: (token: string) => Promise<void>;
-    };
-  }
-}
-
-/**
- * Initializes the popup's UI and event listeners.
- * Exported to allow for direct invocation in a testing environment.
- */
-export function initializePopup() {
-  const prefixInput = document.getElementById('prefix') as HTMLInputElement;
-  const generateBtn = document.getElementById(
-    'generate-btn'
-  ) as HTMLButtonElement;
-  const resultContainer = document.getElementById(
-    'result-container'
-  ) as HTMLElement;
-  const aliasResult = document.getElementById('alias-result') as HTMLElement;
-  const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement;
-  const tokenInput = document.getElementById('token') as HTMLInputElement;
-  const saveTokenBtn = document.getElementById(
-    'save-token-btn'
-  ) as HTMLButtonElement;
-  const statusDiv = document.getElementById('status') as HTMLElement;
-
-  // The core functionality is expected to be on the window object.
-  const core = window.ext;
-
-  // Gracefully handle if the core logic fails to load.
-  if (!core || !core.generateEmailAlias || !core.saveToken) {
-    displayStatus(
-      'Error: Core logic is missing. The extension might be broken.',
-      true
-    );
-    if (prefixInput) prefixInput.disabled = true;
-    if (generateBtn) generateBtn.disabled = true;
-    if (tokenInput) tokenInput.disabled = true;
-    if (saveTokenBtn) saveTokenBtn.disabled = true;
+  // --- Type Guard ---
+  if (!labelInput || !sourceInput || !generateBtn || !resultContainer || !aliasResultSpan || !copyBtn || !errorContainer) {
+    const message = 'A critical UI element is missing from popup.html and the extension cannot function.';
+    console.error(message);
+    if (errorContainer) {
+      errorContainer.textContent = message;
+      errorContainer.classList.remove('hidden');
+    }
     return;
   }
 
-  generateBtn.addEventListener('click', async () => {
-    clearStatus();
-    const prefix = prefixInput.value.trim();
-    if (!prefix) {
-      displayStatus('Prefix cannot be empty.', true);
+  // --- UI Helper Functions ---
+
+  const showError = (message: string) => {
+    errorContainer.textContent = message;
+    errorContainer.classList.remove('hidden');
+    resultContainer.classList.add('hidden');
+  };
+
+  const hideError = () => {
+    if (!errorContainer.classList.contains('hidden')) {
+      errorContainer.classList.add('hidden');
+      errorContainer.textContent = '';
+    }
+  };
+
+  const showResult = (alias: string) => {
+    aliasResultSpan.textContent = alias;
+    resultContainer.classList.remove('hidden');
+    hideError();
+  };
+
+  // --- Event Handlers ---
+
+  const onGenerateClick = async () => {
+    // Get values from both inputs and trim them for validation
+    const label = labelInput.value.trim();
+    const source = sourceInput.value.trim();
+
+    // Perform immediate UI-level validation for better user experience
+    if (!label || !source) {
+      showError('Both Label and Source fields are required.');
       return;
     }
 
+    // Construct the array to pass to the API
+    const aliasParts = [label, source];
+
+    // Clear previous state and disable button
+    hideError();
+    generateBtn.disabled = true;
+    generateBtn.textContent = 'Generating...';
+
     try {
-      const alias = await core.generateEmailAlias(prefix);
-      aliasResult.textContent = alias;
-      resultContainer.style.display = 'block';
-      copyBtn.textContent = 'Copy';
-    } catch (error: unknown) {
-      displayStatus(
-        error instanceof Error ? error.message : String(error),
-        true
-      );
-      resultContainer.style.display = 'none';
+      // Pass the array directly to the API
+      const alias = await generateEmailAlias(aliasParts);
+      showResult(alias);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        showError(error.message);
+      } else {
+        console.error('An unexpected error occurred:', error);
+        showError('An unexpected error occurred. Please check the console.');
+      }
+    } finally {
+      // Re-enable the button
+      generateBtn.disabled = false;
+      generateBtn.textContent = 'Generate';
     }
-  });
+  };
 
-  saveTokenBtn.addEventListener('click', async () => {
-    clearStatus();
-    const token = tokenInput.value;
+  const onCopyClick = async () => {
+    const alias = aliasResultSpan.textContent;
+    if (!alias) return;
+
     try {
-      await core.saveToken(token);
-      displayStatus('Token saved successfully!', false);
-      tokenInput.value = '';
-    } catch (error: unknown) {
-      displayStatus(
-        error instanceof Error ? error.message : String(error),
-        true
-      );
+      await navigator.clipboard.writeText(alias);
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+      }, 1500);
+    } catch (err) {
+      console.error('Failed to copy alias to clipboard: ', err);
+      showError('Could not copy alias to clipboard.');
     }
-  });
+  };
 
-  copyBtn.addEventListener('click', () => {
-    const alias = aliasResult.textContent;
-    if (alias) {
-      navigator.clipboard
-        .writeText(alias)
-        .then(() => {
-          copyBtn.textContent = 'Copied!';
-        })
-        .catch((err) => {
-          displayStatus('Failed to copy to clipboard.', true);
-          console.error('Clipboard error:', err);
-        });
+  // --- Event Listener Registration ---
+  generateBtn.addEventListener('click', onGenerateClick);
+  copyBtn.addEventListener('click', onCopyClick);
+
+  const onEnterPress = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      onGenerateClick();
     }
-  });
+  };
 
-  function displayStatus(message: string, isError = false) {
-    statusDiv.textContent = message;
-    statusDiv.className = isError ? 'error' : 'success';
-  }
-
-  function clearStatus() {
-    statusDiv.textContent = '';
-    statusDiv.className = '';
-  }
-}
-
-// Attach the initialization logic to the DOMContentLoaded event for the browser.
-document.addEventListener('DOMContentLoaded', initializePopup);
+  labelInput.addEventListener('keydown', onEnterPress);
+  sourceInput.addEventListener('keydown', onEnterPress);
+});

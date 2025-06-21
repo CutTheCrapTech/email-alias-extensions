@@ -3,23 +3,27 @@
     /* Base Options */
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "target": "es2022",
-    "lib": ["es2022", "dom"],
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "target": "es2024",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
     "isolatedModules": true,
 
-    /* Module Resolution */
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    /* Strictness */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
 
-    /* JavaScript Support */
-    "allowJs": true,
-    "checkJs": false,
+    /* Bundler mode */
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
 
-    /* Environment */
-    "types": ["node", "webextension-polyfill"]
+    /* Path Aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@common/*": ["packages/common/src/*"]
+    }
   },
-  "include": ["packages/**/*", ".eslintrc.js"],
-  "exclude": ["node_modules", "**/dist"]
+  "exclude": ["node_modules", "dist"]
 }

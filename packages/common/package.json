@@ -1,42 +1,14 @@
 {
-  "name": "@email-alias-extensions/common",
-  "version": "0.1.0",
+  "name": "@monorepo/common",
+  "version": "1.0.0",
   "private": true,
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "module": "dist/index.js",
+  "description": "Shared logic, UI, and assets for the email alias extensions.",
   "type": "module",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
-    }
-  },
+  "main": "src/index.ts",
   "dependencies": {
     "email-alias-core": "^1.0.1"
   },
-  "scripts": {
-    "test": "jest --config jest.config.cjs"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "jsdom",
-    "transform": {
-      "^.+\\\\.ts$": [
-        "ts-jest",
-        {
-          "useESM": true
-        }
-      ]
-    },
-    "moduleNameMapper": {
-      "^(\\.{1,2}/.*)\\\\.js$": "$1"
-    },
-    "setupFilesAfterEnv": [
-      "./src/__test__/setup.ts"
-    ]
-  },
   "devDependencies": {
-    "webextension-polyfill": "^0.12.0"
+    "@types/webextension-polyfill": "^0.10.7"
   }
 }

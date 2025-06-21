@@ -1,21 +1,26 @@
 {
   "manifest_version": 3,
   "name": "Email Alias Generator",
-  "version": "0.1.0",
-  "description": "Generates email aliases based on a secret token and a prefix.",
+  "version": "1.0.0",
+  "description": "Generate email aliases using a secret token and domain.",
   "permissions": ["storage"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
+      "48": "icons/icon48.png"
     }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "scripts": ["background.js"]
   },
   "icons": {
     "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "48": "icons/icon48.png"
   },
   "browser_specific_settings": {
     "gecko": {

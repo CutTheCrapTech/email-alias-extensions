@@ -1,0 +1,8 @@
+# Ignore build output
+dist/
+
+# Ignore dependencies
+node_modules/
+
+# Ignore package-lock.json as it's a generated file
+package-lock.json

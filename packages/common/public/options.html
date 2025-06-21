@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Email Alias Settings</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Settings</h1>
+
+    <div class="section">
+      <label for="domain">
+        Domain
+        <span
+          class="info-icon"
+          title="The domain you own where the aliases will be created, e.g., 'your-domain.com'."
+          >i</span
+        >
+      </label>
+      <input type="text" id="domain" placeholder="your-domain.com" />
+    </div>
+
+    <div class="section">
+      <label for="token">
+        Secret Token
+        <span
+          class="info-icon"
+          title="The secret key used to generate unique, secure aliases. Keep this safe!"
+          >i</span
+        >
+      </label>
+      <input type="password" id="token" placeholder="Enter your secret token" />
+    </div>
+
+    <button id="save-btn">Save</button>
+
+    <div id="status-message" class="hidden"></div>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

@@ -1,54 +1,67 @@
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
-import prettierPlugin from 'eslint-plugin-prettier';
-import prettierConfig from 'eslint-config-prettier';
+import js from "@eslint/js";
+import globals from "globals";
+import tseslint from "typescript-eslint";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import vitest from "eslint-plugin-vitest";
 
-export default tseslint.config(
-  // Global ignores
+/**
+ * @type {import('eslint').Linter.FlatConfig[]}
+ */
+export default [
+  // 1. Global ignores
   {
-    ignores: [
-      'dist/',
-      'scripts/',
-      'packages/*/dist/',
-      'packages/**/*.js',
-      'packages/**/*.d.ts',
-      'packages/*/build.js',
-      'packages/*/build.cjs',
-      'packages/*/temp/',
-      // We should also ignore JS files in the common package that are not the shim
-      'packages/common/src/index.js',
-    ],
+    ignores: ["dist/", "node_modules/"],
   },
 
-  // Base recommended configs
-  ...tseslint.configs.recommended,
+  // 2. Base configurations for all files
+  js.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
 
-  // Main configuration for project TypeScript/JavaScript files
+  // 3. Configuration for TypeScript source code across all packages
   {
-    files: ['**/*.ts'],
-    plugins: {
-      prettier: prettierPlugin,
-    },
+    files: ["packages/**/src/**/*.ts"],
+    // This `ignores` is crucial. It prevents this rule from applying to test files,
+    // which will be handled by the next configuration object.
+    ignores: ["packages/**/src/__tests__/**/*.ts"],
     languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      parser: tseslint.parser,
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
       globals: {
         ...globals.browser,
-        ...globals.node,
-        ...globals.jest,
-        // WebExtensions globals
-        chrome: 'readonly',
+        browser: "readonly",
       },
     },
     rules: {
-      'prettier/prettier': 'error',
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
     },
   },
 
-  // Override for CommonJS files, like jest.config.cjs
+  // 4. Configuration specifically for test files
   {
-    files: ['**/*.cjs'],
+    files: ["packages/**/src/__tests__/**/*.ts"],
+    plugins: {
+      vitest,
+    },
+    rules: {
+      // Use the recommended rules from the vitest plugin
+      ...vitest.configs.recommended.rules,
+    },
+    languageOptions: {
+      // Define test-specific globals like `describe`, `it`, `expect`
+      globals: {
+        ...vitest.configs.recommended.globals,
+      },
+    },
+  },
+
+  // 5. Configuration for Node.js scripts (build script, config files)
+  {
+    files: ["scripts/**/*.mjs", "eslint.config.js"],
     languageOptions: {
       globals: {
         ...globals.node,
@@ -56,6 +69,6 @@ export default tseslint.config(
     },
   },
 
-  // The Prettier config must be last to disable any style rules that conflict with Prettier.
-  prettierConfig
-);
+  // 6. Prettier configuration must be the last item.
+  eslintPluginPrettierRecommended,
+];
