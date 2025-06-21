@@ -14,6 +14,7 @@ browser.runtime.onInstalled.addListener((details) => {
     console.log('Extension successfully installed. Opening options page...');
     // This is a browser API call that opens the extension's options page.
     // The options page is defined in the `manifest.json` file.
-    browser.runtime.openOptionsPage();
+    // We use `void` to explicitly mark the promise as intentionally unhandled.
+    void browser.runtime.openOptionsPage();
   }
 });

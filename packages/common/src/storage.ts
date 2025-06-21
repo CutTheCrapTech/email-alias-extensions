@@ -39,8 +39,9 @@ export async function loadSettings(): Promise<ExtensionSettings> {
   try {
     const storageResult = await browser.storage.sync.get(SETTINGS_KEY);
     // The result from the storage API is an object like: { extension_settings: { ... } }
-    // We return the nested settings object, or an empty object if it's not found.
-    return storageResult[SETTINGS_KEY] || {};
+    // We explicitly cast the result to our expected type to satisfy the linter,
+    // and return it, or an empty object if it's not found.
+    return (storageResult[SETTINGS_KEY] as ExtensionSettings) || {};
   } catch (error) {
     console.error('Failed to load settings:', error);
     throw new Error('Could not load settings from browser storage.');

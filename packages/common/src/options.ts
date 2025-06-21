@@ -27,13 +27,15 @@ function showStatusMessage(message: string, isError = false): void {
  */
 document.addEventListener('DOMContentLoaded', () => {
   // Get references to the crucial DOM elements
-  const domainInput = document.getElementById('domain') as HTMLInputElement | null;
-  const tokenInput = document.getElementById('token') as HTMLInputElement | null;
-  const saveButton = document.getElementById('save-btn') as HTMLButtonElement | null;
+  const domainInput = document.getElementById('domain') as HTMLInputElement;
+  const tokenInput = document.getElementById('token') as HTMLInputElement;
+  const saveButton = document.getElementById('save-btn') as HTMLButtonElement;
 
   // Type guard to ensure all elements were found
   if (!domainInput || !tokenInput || !saveButton) {
-    console.error('Could not find one or more required elements on the options page.');
+    console.error(
+      'Could not find one or more required elements on the options page.'
+    );
     return;
   }
 
@@ -46,7 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
       domainInput.value = settings.domain || '';
       tokenInput.value = settings.token || '';
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'An unknown error occurred.';
+      const message =
+        error instanceof Error ? error.message : 'An unknown error occurred.';
       showStatusMessage(`Error loading settings: ${message}`, true);
     }
   }
@@ -55,24 +58,32 @@ document.addEventListener('DOMContentLoaded', () => {
    * Handles the save button click event.
    * It retrieves values from the inputs, saves them, and provides feedback.
    */
-  saveButton.addEventListener('click', async () => {
-    const domain = domainInput.value.trim();
-    const token = tokenInput.value.trim();
+  saveButton.addEventListener('click', () => {
+    // This is an async IIFE (Immediately Invoked Function Expression).
+    // It allows us to use `await` inside the event listener without making
+    // the listener itself async, which would violate the no-misused-promises rule.
+    void (async () => {
+      const domain = domainInput.value.trim();
+      const token = tokenInput.value.trim();
 
-    if (!domain || !token) {
-      showStatusMessage('Both Domain and Token fields are required.', true);
-      return;
-    }
+      if (!domain || !token) {
+        showStatusMessage('Both Domain and Token fields are required.', true);
+        return;
+      }
 
-    try {
-      await saveSettings({ domain, token });
-      showStatusMessage('Settings saved successfully!');
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'An unknown error occurred.';
-      showStatusMessage(`Error saving settings: ${message}`, true);
-    }
+      try {
+        await saveSettings({ domain, token });
+        showStatusMessage('Settings saved successfully!');
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'An unknown error occurred.';
+        showStatusMessage(`Error saving settings: ${message}`, true);
+      }
+    })();
   });
 
-  // Initially load the settings when the page is opened
-  loadAndDisplaySettings();
+  // Initially load the settings when the page is opened.
+  // We use `void` here to explicitly mark the promise as intentionally unhandled,
+  // fixing the no-floating-promises lint error.
+  void loadAndDisplaySettings();
 });

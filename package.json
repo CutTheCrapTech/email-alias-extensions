@@ -2,6 +2,7 @@
   "name": "email-alias-extensions-monorepo",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Browser extensions for generating email aliases.",
   "scripts": {
     "build": "node scripts/build.mjs",
@@ -17,8 +18,6 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.34.1",
-    "@typescript-eslint/parser": "^8.34.1",
     "esbuild": "^0.25.5",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
@@ -29,6 +28,7 @@
     "jsdom": "^26.1.0",
     "prettier": "^3.5.3",
     "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.1",
     "vitest": "^3.2.4"
   }
 }

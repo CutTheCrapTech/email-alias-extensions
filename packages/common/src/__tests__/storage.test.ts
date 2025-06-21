@@ -2,24 +2,38 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { saveSettings, loadSettings, ExtensionSettings } from '../storage';
 import browser from 'webextension-polyfill';
 
+// --- Type definitions for our mocks ---
+
+// The structure of the data we are storing in our mock.
+type MockStorageData = {
+  extension_settings?: ExtensionSettings;
+};
+
+// The type for the mock `browser.storage.sync` object, including our custom helper method.
+type MockBrowserStorageSync = typeof browser.storage.sync & {
+  _clear: () => void;
+};
+
 // --- Mocking the `webextension-polyfill` library ---
 // We mock the entire module to control the behavior of `browser.storage.sync`.
 vi.mock('webextension-polyfill', () => {
   // A simple in-memory store to simulate the browser's storage
-  let memoryStore: { [key: string]: any } = {};
+  let memoryStore: MockStorageData = {};
 
   return {
     default: {
       storage: {
         sync: {
           // Mock `set` to store data in our in-memory store
-          set: vi.fn((data) => {
+          set: vi.fn((data: MockStorageData) => {
             Object.assign(memoryStore, data);
             return Promise.resolve();
           }),
           // Mock `get` to retrieve data from our in-memory store
-          get: vi.fn((key) => {
-            return Promise.resolve({ [key as string]: memoryStore[key as string] });
+          get: vi.fn((key: keyof MockStorageData) => {
+            return Promise.resolve({
+              [key]: memoryStore[key],
+            });
           }),
           // A helper function for our tests to clear the store
           _clear: () => {
@@ -35,7 +49,8 @@ describe('Storage Module', () => {
   // Before each test, clear the mock history and our in-memory store
   beforeEach(() => {
     vi.clearAllMocks();
-    (browser.storage.sync as any)._clear();
+    // Use our custom type to access the `_clear` helper without `any`
+    (browser.storage.sync as MockBrowserStorageSync)._clear();
   });
 
   describe('saveSettings', () => {
@@ -69,7 +84,9 @@ describe('Storage Module', () => {
       const loaded = await loadSettings();
 
       // We expect `get` to have been called with the correct key
-      expect(browser.storage.sync.get).toHaveBeenCalledWith('extension_settings');
+      expect(browser.storage.sync.get).toHaveBeenCalledWith(
+        'extension_settings'
+      );
       // And we expect the loaded settings to match what we saved
       expect(loaded).toEqual(settings);
     });
@@ -78,7 +95,9 @@ describe('Storage Module', () => {
       // Ensure the store is empty, then try to load settings
       const loaded = await loadSettings();
 
-      expect(browser.storage.sync.get).toHaveBeenCalledWith('extension_settings');
+      expect(browser.storage.sync.get).toHaveBeenCalledWith(
+        'extension_settings'
+      );
       // The result should be an empty object, not null or undefined
       expect(loaded).toEqual({});
     });

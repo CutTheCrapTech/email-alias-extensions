@@ -1,4 +1,4 @@
-import { generateAlias as coreGenerateAlias } from 'email-alias-core';
+import { generateEmailAlias as coreGenerateAlias } from 'email-alias-core';
 import { loadSettings } from './storage';
 
 /**
@@ -27,7 +27,9 @@ export class ApiError extends Error {
  * @throws {ApiError} - Throws a custom error if settings are missing, the parts are invalid,
  *                      or if the core library fails.
  */
-export async function generateEmailAlias(aliasParts: string[]): Promise<string> {
+export async function generateEmailAlias(
+  aliasParts: string[]
+): Promise<string> {
   // 1. Validate the input array and its contents
   if (!aliasParts || aliasParts.length !== 2) {
     throw new ApiError(
@@ -51,17 +53,22 @@ export async function generateEmailAlias(aliasParts: string[]): Promise<string> 
 
   try {
     // 4. Call the core library to generate the alias.
-    const alias = await coreGenerateAlias({
+    const result = await coreGenerateAlias({
       aliasParts, // Pass the array directly
       domain,
       secretKey: token,
     });
-    return alias;
-  } catch (error) {
+
+    return result;
+  } catch (error: unknown) {
     // 5. Catch potential errors from the core library and re-throw as an ApiError
     console.error('Error during alias generation from core library:', error);
-    const message =
+
+    // Safe error message extraction
+    const errorMessage =
       error instanceof Error ? error.message : 'An unknown error occurred.';
-    throw new ApiError(`Failed to generate alias: ${message}`);
+
+    // Throw a new ApiError with the extracted message
+    throw new ApiError(`Failed to generate alias: ${errorMessage}`);
   }
 }

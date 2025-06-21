@@ -54,7 +54,9 @@ async function buildExtension(buildConfig) {
 
     // 2. Copy all shared public assets (HTML, CSS, etc.) from the common package.
     await fs.copy(commonPublicDir, extensionOutDir);
-    console.log(`[${name}] Copied shared assets from 'packages/common/public'.`);
+    console.log(
+      `[${name}] Copied shared assets from 'packages/common/public'.`
+    );
 
     // 3. Copy the browser-specific manifest.json.
     const manifestSrc = path.join(browserPublicDir, 'manifest.json');
@@ -68,7 +70,9 @@ async function buildExtension(buildConfig) {
       outdir: extensionOutDir, // Set the output directory for the bundled JS
     });
     console.log(`[${name}] Successfully bundled TypeScript scripts.`);
-    console.log(`[${name}] Build completed! Find the artifacts in: ${extensionOutDir}`);
+    console.log(
+      `[${name}] Build completed! Find the artifacts in: ${extensionOutDir}`
+    );
   } catch (err) {
     console.error(`[${name}] Build failed:`, err);
     process.exit(1); // Exit with an error code
@@ -97,7 +101,9 @@ async function main() {
       // Build only the specified target
       await buildExtension(builds[buildTarget]);
     } else {
-      console.error(`Error: Unknown build target "${buildTarget}". Available targets are: ${Object.keys(builds).join(', ')}`);
+      console.error(
+        `Error: Unknown build target "${buildTarget}". Available targets are: ${Object.keys(builds).join(', ')}`
+      );
       process.exit(1);
     }
   } else {

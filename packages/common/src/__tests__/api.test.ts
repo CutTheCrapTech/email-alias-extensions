@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { generateEmailAlias, ApiError } from '../api';
 import { loadSettings } from '../storage';
-import { generateAlias as coreGenerateAlias } from 'email-alias-core';
+import { generateEmailAlias as coreGenerateAlias } from 'email-alias-core';
 
 // Mock the dependencies of api.ts to isolate the module for testing
 vi.mock('../storage', () => ({
   loadSettings: vi.fn(),
 }));
 vi.mock('email-alias-core', () => ({
-  generateAlias: vi.fn(),
+  generateEmailAlias: vi.fn(),
 }));
 
 describe('API Module: generateEmailAlias', () => {
@@ -45,31 +45,55 @@ describe('API Module: generateEmailAlias', () => {
       'Invalid input: exactly two parts (Label and Source) are required.';
 
     it('should throw an ApiError if aliasParts array is empty', async () => {
-      await expect(generateEmailAlias([])).rejects.toThrow(expectedError);
+      try {
+        await generateEmailAlias([]);
+        expect.fail('Expected function to throw');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApiError);
+        expect((error as ApiError).message).toBe(expectedError);
+      }
     });
 
     it('should throw an ApiError if aliasParts array has only one element', async () => {
-      await expect(generateEmailAlias(['shopping'])).rejects.toThrow(
-        expectedError
-      );
+      try {
+        await generateEmailAlias(['shopping']);
+        expect.fail('Expected function to throw');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApiError);
+        expect((error as ApiError).message).toBe(expectedError);
+      }
     });
 
     it('should throw an ApiError if aliasParts array has more than two elements', async () => {
-      await expect(generateEmailAlias(['a', 'b', 'c'])).rejects.toThrow(
-        expectedError
-      );
+      try {
+        await generateEmailAlias(['a', 'b', 'c']);
+        expect.fail('Expected function to throw');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApiError);
+        expect((error as ApiError).message).toBe(expectedError);
+      }
     });
 
     it('should throw an ApiError if any part in the array is an empty string', async () => {
-      await expect(generateEmailAlias(['shopping', ''])).rejects.toThrow(
-        'Both Label and Source fields are required.'
-      );
+      const errorMessage = 'Both Label and Source fields are required.';
+      try {
+        await generateEmailAlias(['shopping', '']);
+        expect.fail('Expected function to throw');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApiError);
+        expect((error as ApiError).message).toBe(errorMessage);
+      }
     });
 
     it('should throw an ApiError if any part in the array is just whitespace', async () => {
-      await expect(generateEmailAlias(['   ', 'amazon'])).rejects.toThrow(
-        'Both Label and Source fields are required.'
-      );
+      const errorMessage = 'Both Label and Source fields are required.';
+      try {
+        await generateEmailAlias(['   ', 'amazon']);
+        expect.fail('Expected function to throw');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApiError);
+        expect((error as ApiError).message).toBe(errorMessage);
+      }
     });
   });
 
@@ -79,9 +103,15 @@ describe('API Module: generateEmailAlias', () => {
       vi.mocked(loadSettings).mockResolvedValue({});
 
       // Act & Assert
-      await expect(generateEmailAlias(['test', 'case'])).rejects.toThrow(
-        /Domain and Token are not configured/
-      );
+      try {
+        await generateEmailAlias(['test', 'case']);
+        expect.fail('Expected function to throw');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApiError);
+        expect((error as ApiError).message).toMatch(
+          /Domain and Token are not configured/
+        );
+      }
     });
   });
 
@@ -93,9 +123,15 @@ describe('API Module: generateEmailAlias', () => {
       vi.mocked(coreGenerateAlias).mockRejectedValue(coreError);
 
       // Act & Assert
-      await expect(generateEmailAlias(['test', 'case'])).rejects.toThrow(
-        `Failed to generate alias: ${coreError.message}`
-      );
+      try {
+        await generateEmailAlias(['test', 'case']);
+        expect.fail('Expected function to throw');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApiError);
+        expect((error as ApiError).message).toBe(
+          `Failed to generate alias: ${coreError.message}`
+        );
+      }
     });
   });
 });

@@ -2,17 +2,40 @@ import { generateEmailAlias, ApiError } from './api';
 
 document.addEventListener('DOMContentLoaded', () => {
   // --- DOM Element Selection ---
-  const labelInput = document.getElementById('label-input') as HTMLInputElement | null;
-  const sourceInput = document.getElementById('source-input') as HTMLInputElement | null;
-  const generateBtn = document.getElementById('generate-btn') as HTMLButtonElement | null;
-  const resultContainer = document.getElementById('result-container') as HTMLDivElement | null;
-  const aliasResultSpan = document.getElementById('alias-result') as HTMLSpanElement | null;
-  const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement | null;
-  const errorContainer = document.getElementById('error-container') as HTMLDivElement | null;
+  const labelInput = document.getElementById(
+    'label-input'
+  ) as HTMLInputElement | null;
+  const sourceInput = document.getElementById(
+    'source-input'
+  ) as HTMLInputElement | null;
+  const generateBtn = document.getElementById(
+    'generate-btn'
+  ) as HTMLButtonElement | null;
+  const resultContainer = document.getElementById(
+    'result-container'
+  ) as HTMLDivElement | null;
+  const aliasResultSpan = document.getElementById(
+    'alias-result'
+  ) as HTMLSpanElement | null;
+  const copyBtn = document.getElementById(
+    'copy-btn'
+  ) as HTMLButtonElement | null;
+  const errorContainer = document.getElementById(
+    'error-container'
+  ) as HTMLDivElement | null;
 
   // --- Type Guard ---
-  if (!labelInput || !sourceInput || !generateBtn || !resultContainer || !aliasResultSpan || !copyBtn || !errorContainer) {
-    const message = 'A critical UI element is missing from popup.html and the extension cannot function.';
+  if (
+    !labelInput ||
+    !sourceInput ||
+    !generateBtn ||
+    !resultContainer ||
+    !aliasResultSpan ||
+    !copyBtn ||
+    !errorContainer
+  ) {
+    const message =
+      'A critical UI element is missing from popup.html and the extension cannot function.';
     console.error(message);
     if (errorContainer) {
       errorContainer.textContent = message;
@@ -42,29 +65,24 @@ document.addEventListener('DOMContentLoaded', () => {
     hideError();
   };
 
-  // --- Event Handlers ---
+  // --- Core Async Logic ---
 
-  const onGenerateClick = async () => {
-    // Get values from both inputs and trim them for validation
+  const handleGeneration = async () => {
     const label = labelInput.value.trim();
     const source = sourceInput.value.trim();
 
-    // Perform immediate UI-level validation for better user experience
     if (!label || !source) {
       showError('Both Label and Source fields are required.');
       return;
     }
 
-    // Construct the array to pass to the API
     const aliasParts = [label, source];
 
-    // Clear previous state and disable button
     hideError();
     generateBtn.disabled = true;
     generateBtn.textContent = 'Generating...';
 
     try {
-      // Pass the array directly to the API
       const alias = await generateEmailAlias(aliasParts);
       showResult(alias);
     } catch (error) {
@@ -75,13 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
         showError('An unexpected error occurred. Please check the console.');
       }
     } finally {
-      // Re-enable the button
       generateBtn.disabled = false;
       generateBtn.textContent = 'Generate';
     }
   };
 
-  const onCopyClick = async () => {
+  const handleCopy = async () => {
     const alias = aliasResultSpan.textContent;
     if (!alias) return;
 
@@ -98,13 +115,21 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // --- Event Listener Registration ---
-  generateBtn.addEventListener('click', onGenerateClick);
-  copyBtn.addEventListener('click', onCopyClick);
+
+  // Use simple, non-async listeners that call the core async logic.
+  // The `void` operator correctly handles the returned promise.
+  generateBtn.addEventListener('click', () => {
+    void handleGeneration();
+  });
+
+  copyBtn.addEventListener('click', () => {
+    void handleCopy();
+  });
 
   const onEnterPress = (event: KeyboardEvent) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      onGenerateClick();
+      void handleGeneration();
     }
   };
 
