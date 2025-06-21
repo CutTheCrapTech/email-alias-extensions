@@ -1,6 +1,18 @@
 // This script handles the UI logic for the extension's popup.
 // It is designed to be testable by exporting its initialization logic.
 
+// This script depends on functions from the 'common' package, which should be loaded
+// before this script and exposed on a global object (e.g., `window.ext`).
+
+declare global {
+  interface Window {
+    ext: {
+      generateEmailAlias: (prefix: string) => Promise<string>;
+      saveToken: (token: string) => Promise<void>;
+    };
+  }
+}
+
 /**
  * Initializes the popup's UI and event listeners.
  * Exported to allow for direct invocation in a testing environment.

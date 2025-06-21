@@ -4,6 +4,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "target": "es2022",
+    "lib": ["es2022", "dom"],
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "isolatedModules": true,
@@ -19,6 +20,6 @@
     /* Environment */
     "types": ["node", "webextension-polyfill"]
   },
-  "include": ["packages/", ".eslintrc.js"],
-  "exclude": ["node_modules", "packages/*/dist"]
+  "include": ["packages/**/*", ".eslintrc.js"],
+  "exclude": ["node_modules", "**/dist"]
 }

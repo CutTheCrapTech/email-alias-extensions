@@ -7,58 +7,53 @@ import {
   afterEach,
 } from '@jest/globals';
 import * as api from '../index.js';
+import browser from 'webextension-polyfill';
 
-// Define a simplified type for our mock `browser` object to satisfy TypeScript.
-// This makes the mock's shape explicit and avoids using `any`.
-type MockBrowser = {
-  storage: {
-    local: {
-      get: jest.Mock<(key: string) => Promise<Record<string, unknown>>>;
-      set: jest.Mock<(items: Record<string, unknown>) => Promise<void>>;
-    };
+// Mock the browser storage API
+const mockStorage = () => {
+  const store: Record<string, any> = {};
+  return {
+    get: jest.fn(async (keys?: string | string[] | object | null) => {
+      if (!keys) return store;
+      if (typeof keys === 'string') return { [keys]: store[keys] };
+      if (Array.isArray(keys))
+        return keys.reduce((acc, k) => ({ ...acc, [k]: store[k] }), {});
+      return {};
+    }),
+    set: jest.fn(async (items: object) => {
+      Object.assign(store, items);
+    }),
+    remove: jest.fn(async (keys: string | string[]) => {
+      if (typeof keys === 'string') delete store[keys];
+      else keys.forEach((k) => delete store[k]);
+    }),
+    clear: jest.fn(async () => {
+      for (const key in store) delete store[key];
+    }),
   };
 };
 
-// Extend the `globalThis` type to include our optional `browser` mock.
-declare let globalThis: {
-  browser?: MockBrowser;
-};
-
 describe('email-alias-extensions/common', () => {
-  // This will hold our in-memory storage for each test.
-  let store: Record<string, unknown>;
+  let mockLocalStorage: ReturnType<typeof mockStorage>;
 
   beforeEach(() => {
-    // Reset the store for each test to ensure isolation.
-    store = {};
+    mockLocalStorage = mockStorage();
 
-    // Mock the browser API with a simplified implementation.
-    globalThis.browser = {
-      storage: {
-        local: {
-          get: jest.fn(async (key: string) => {
-            return { [key]: store[key] };
-          }),
-          set: jest.fn(async (items: Record<string, unknown>) => {
-            Object.assign(store, items);
-          }),
-        },
-      },
-    };
+    // Mock only the storage.local methods we use
+    (browser.storage.local as any) = mockLocalStorage;
+    jest.spyOn(browser.storage.local, 'get');
+    jest.spyOn(browser.storage.local, 'set');
   });
 
   afterEach(() => {
-    // Clean up mocks and the global object.
-    jest.restoreAllMocks();
-    delete globalThis.browser;
+    jest.clearAllMocks();
   });
 
   it('should save and get token', async () => {
     await api.saveToken('my-secret-token');
     const token = await api.getToken();
     expect(token).toBe('my-secret-token');
-    // Verify that `set` was called correctly.
-    expect(globalThis.browser?.storage.local.set).toHaveBeenCalledWith({
+    expect(browser.storage.local.set).toHaveBeenCalledWith({
       'email-alias-token': 'my-secret-token',
     });
   });
@@ -78,9 +73,8 @@ describe('email-alias-extensions/common', () => {
   });
 
   it('should throw if token is not set when generating alias', async () => {
+    await mockLocalStorage.set({ 'email-alias-token': null });
     await api.saveDomain('example.com');
-    // Manually ensure token is not in the store for this test.
-    store['email-alias-token'] = null;
     await expect(api.generateEmailAlias('foo')).rejects.toThrow(
       'Authentication token is not set'
     );
@@ -88,8 +82,7 @@ describe('email-alias-extensions/common', () => {
 
   it('should throw if domain is not set when generating alias', async () => {
     await api.saveToken('my-secret-token');
-    // Manually ensure domain is not in the store for this test.
-    store['email-alias-domain'] = null;
+    await mockLocalStorage.set({ 'email-alias-domain': null });
     await expect(api.generateEmailAlias('foo')).rejects.toThrow(
       'Domain is not set'
     );
@@ -105,9 +98,6 @@ describe('email-alias-extensions/common', () => {
 
     const alias = await api.generateEmailAlias(prefix);
 
-    // The expected output from `email-alias-core` is deterministic, but we'll
-    // just check the format to make the test more robust.
-    // Expected format: <prefix><hash>@<domain>
     expect(alias).toBeDefined();
     expect(typeof alias).toBe('string');
     expect(alias.startsWith(prefix)).toBe(true);

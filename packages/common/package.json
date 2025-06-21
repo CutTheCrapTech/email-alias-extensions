@@ -16,13 +16,27 @@
     "email-alias-core": "^1.0.1"
   },
   "scripts": {
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "jest --config jest.config.cjs"
   },
   "jest": {
-    "preset": "ts-jest/presets/default-esm",
-    "testEnvironment": "node",
+    "preset": "ts-jest",
+    "testEnvironment": "jsdom",
+    "transform": {
+      "^.+\\\\.ts$": [
+        "ts-jest",
+        {
+          "useESM": true
+        }
+      ]
+    },
     "moduleNameMapper": {
-      "^(\\.{1,2}/.*)\\.js$": "$1"
-    }
+      "^(\\.{1,2}/.*)\\\\.js$": "$1"
+    },
+    "setupFilesAfterEnv": [
+      "./src/__test__/setup.ts"
+    ]
+  },
+  "devDependencies": {
+    "webextension-polyfill": "^0.12.0"
   }
 }

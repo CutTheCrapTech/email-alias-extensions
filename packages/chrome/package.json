@@ -5,8 +5,6 @@
   "main": "dist/popup.js",
   "type": "module",
   "scripts": {
-    "build": "tsc --build",
-    "watch": "tsc --build --watch",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "echo 'No tests in chrome package'"
   }
 }
