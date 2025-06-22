@@ -25,6 +25,7 @@ const esbuildConfig = {
     path.join(commonDir, 'src', 'popup.ts'),
     path.join(commonDir, 'src', 'options.ts'),
     path.join(commonDir, 'src', 'background.ts'),
+    path.join(commonDir, 'src', 'content.ts'),
   ],
   bundle: true,
   format: 'esm', // Use ES modules for modern extensions

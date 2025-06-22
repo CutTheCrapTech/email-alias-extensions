@@ -1,4 +1,5 @@
 import { generateEmailAlias, ApiError } from './api';
+import browser from 'webextension-polyfill';
 
 document.addEventListener('DOMContentLoaded', () => {
   // --- DOM Element Selection ---
@@ -46,16 +47,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- UI Helper Functions ---
 
-  const showError = (message: string) => {
-    errorContainer.textContent = message;
+  const showError = (message: string, showOptionsButton = false) => {
+    errorContainer.innerHTML = showOptionsButton
+      ? `${message} <button id="open-options-btn" style="margin-left: 8px;">Open Settings</button>`
+      : message;
     errorContainer.classList.remove('hidden');
     resultContainer.classList.add('hidden');
+
+    // Add event listener for the options button if it was created
+    if (showOptionsButton) {
+      const optionsBtn = document.getElementById('open-options-btn');
+      if (optionsBtn) {
+        optionsBtn.addEventListener('click', () => {
+          void browser.runtime.sendMessage({ action: 'openOptionsPage' });
+          window.close(); // Close the popup
+        });
+      }
+    }
   };
 
   const hideError = () => {
     if (!errorContainer.classList.contains('hidden')) {
       errorContainer.classList.add('hidden');
-      errorContainer.textContent = '';
+      errorContainer.innerHTML = '';
     }
   };
 
@@ -63,6 +77,28 @@ document.addEventListener('DOMContentLoaded', () => {
     aliasResultSpan.textContent = alias;
     resultContainer.classList.remove('hidden');
     hideError();
+  };
+
+  // --- Auto-fill functionality ---
+  const fillActiveEmailField = async (alias: string) => {
+    try {
+      const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+      if (tab?.id) {
+        await browser.tabs.sendMessage(tab.id, {
+          action: 'fillEmailField',
+          alias: alias,
+        });
+      }
+    } catch (error) {
+      console.log(
+        'Could not auto-fill field (this is normal if no email field is focused):',
+        error
+      );
+      // Don't show this as an error to the user since it's expected behavior
+    }
   };
 
   // --- Core Async Logic ---
@@ -85,9 +121,16 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const alias = await generateEmailAlias(aliasParts);
       showResult(alias);
+
+      // Try to auto-fill the active email field
+      await fillActiveEmailField(alias);
     } catch (error) {
       if (error instanceof ApiError) {
-        showError(error.message);
+        // Check if the error is about missing domain/token configuration
+        const isConfigError = error.message.includes(
+          'Domain and Token are not configured'
+        );
+        showError(error.message, isConfigError);
       } else {
         console.error('An unexpected error occurred:', error);
         showError('An unexpected error occurred. Please check the console.');

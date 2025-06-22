@@ -43,8 +43,9 @@
 
 /* --- Base Styles --- */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
   width: 320px;
   padding: 16px;
   color: var(--text-primary);
@@ -55,6 +56,13 @@ h1 {
   font-size: 1.5em;
   margin-top: 0;
   margin-bottom: 16px;
+  color: var(--text-heading);
+}
+
+h2 {
+  font-size: 1.2em;
+  margin-top: 24px;
+  margin-bottom: 12px;
   color: var(--text-heading);
 }
 
@@ -155,4 +163,72 @@ button.full-width {
   margin-left: 6px;
   position: relative;
   top: -1px;
+}
+
+/* --- New styles for options page sections --- */
+.pin-section,
+.context-menu-section {
+  margin-top: 32px;
+  padding: 16px;
+  background-color: var(--background-result);
+  border: 1px solid var(--border-result);
+  border-radius: 8px;
+}
+
+.pin-instructions,
+.context-instructions {
+  margin: 12px 0;
+  padding-left: 20px;
+}
+
+.pin-instructions li,
+.context-instructions li {
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.puzzle-icon,
+.pin-icon {
+  font-size: 16px;
+  margin: 0 2px;
+}
+
+.pin-note {
+  margin-top: 12px;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* --- Options page specific styles --- */
+body:has(h1:contains('Settings')) {
+  width: auto;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* For Chrome/Edge that don't support :has() yet */
+@supports not (selector(:has(*))) {
+  .options-page {
+    width: auto;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+}
+
+/* Error message with button styling */
+#error-container button {
+  padding: 4px 8px;
+  font-size: 12px;
+  margin-left: 8px;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+#error-container button:hover {
+  background-color: var(--button-bg-hover);
 }
