@@ -88,6 +88,8 @@ npm run watch
 > [!CAUTION]
 >
 > Store your token securely in your password manager. You will need it to validate generated aliases in cloudflare workers. And more importantly if you lose it, you will not be able to validate the aliases generated going forward. You will not stop receiveing emails as such but spam protection on catchall becomes useless. I can't stress this enough, store it securely in your password manager.
+>
+> For example, if this token leaks its not too bad, the spammer will be able to spam you creating random aliases (not worth the effort unless this is used by millions, which itself is unlikely as one needs a domain to use it, which many wont bother), but if you lose it, you will not be able to validate the aliases generated going forward or maybe even lose the ability to receive emails if its deleted from cloudflare. So you can use a weaker token, but I highly recommend storing it securely in your password manager.
 
 2. **Generate Aliases**:
 
