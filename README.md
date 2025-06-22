@@ -85,7 +85,7 @@ npm run watch
    - Enter your secret token and domain (e.g., `example.com`).
    - Click **Save**.
 
-   > [!CAUTION] > **Store your token securely in your password manager. You will need it to validate generated aliases in cloudflare workers. And more importantly if you lose it, you will not be able to validate the aliases generated going forward. You will not stop receiveing emails as such but spam protection on catchall becomes useless. I can't stress this enough, store it securely in your password manager.**
+   <span style="color:red">**Store your token securely in your password manager. You will need it to validate generated aliases in cloudflare workers. And more importantly if you lose it, you will not be able to validate the aliases generated going forward. You will not stop receiveing emails as such but spam protection on catchall becomes useless. I can't stress this enough, store it securely in your password manager.**</span>
 
 2. **Generate Aliases**:
 
