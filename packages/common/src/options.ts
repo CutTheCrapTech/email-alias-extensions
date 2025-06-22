@@ -1,4 +1,5 @@
 import { loadSettings, saveSettings } from './storage';
+import { ShortcutRecorder } from './shortcuts';
 
 /**
  * A helper function to display a status message to the user.
@@ -29,15 +30,64 @@ document.addEventListener('DOMContentLoaded', () => {
   // Get references to the crucial DOM elements
   const domainInput = document.getElementById('domain') as HTMLInputElement;
   const tokenInput = document.getElementById('token') as HTMLInputElement;
+  const defaultLabelInput = document.getElementById(
+    'default-label'
+  ) as HTMLInputElement;
   const saveButton = document.getElementById('save-btn') as HTMLButtonElement;
 
+  // Keyboard shortcut elements
+  const popupShortcutInput = document.getElementById(
+    'popup-shortcut'
+  ) as HTMLInputElement;
+  const fillShortcutInput = document.getElementById(
+    'fill-shortcut'
+  ) as HTMLInputElement;
+  const recordPopupBtn = document.getElementById(
+    'record-popup-shortcut'
+  ) as HTMLButtonElement;
+  const recordFillBtn = document.getElementById(
+    'record-fill-shortcut'
+  ) as HTMLButtonElement;
+  const clearPopupBtn = document.getElementById(
+    'clear-popup-shortcut'
+  ) as HTMLButtonElement;
+  const clearFillBtn = document.getElementById(
+    'clear-fill-shortcut'
+  ) as HTMLButtonElement;
+
   // Type guard to ensure all elements were found
-  if (!domainInput || !tokenInput || !saveButton) {
+  if (
+    !domainInput ||
+    !tokenInput ||
+    !defaultLabelInput ||
+    !saveButton ||
+    !popupShortcutInput ||
+    !fillShortcutInput ||
+    !recordPopupBtn ||
+    !recordFillBtn ||
+    !clearPopupBtn ||
+    !clearFillBtn
+  ) {
     console.error(
       'Could not find one or more required elements on the options page.'
     );
     return;
   }
+
+  // Initialize shortcut recorder and register shortcuts
+  const shortcutRecorder = new ShortcutRecorder();
+
+  shortcutRecorder.registerShortcut({
+    input: popupShortcutInput,
+    recordButton: recordPopupBtn,
+    clearButton: clearPopupBtn,
+  });
+
+  shortcutRecorder.registerShortcut({
+    input: fillShortcutInput,
+    recordButton: recordFillBtn,
+    clearButton: clearFillBtn,
+  });
 
   /**
    * Loads the current settings from storage and populates the input fields.
@@ -47,6 +97,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const settings = await loadSettings();
       domainInput.value = settings.domain || '';
       tokenInput.value = settings.token || '';
+      defaultLabelInput.value =
+        typeof settings.defaultLabel === 'string'
+          ? settings.defaultLabel
+          : 'marketing';
+
+      // Load keyboard shortcuts
+      if (settings.keyboardShortcuts) {
+        popupShortcutInput.value = settings.keyboardShortcuts.openPopup || '';
+        fillShortcutInput.value =
+          settings.keyboardShortcuts.fillCurrentField || '';
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'An unknown error occurred.';
@@ -65,14 +126,25 @@ document.addEventListener('DOMContentLoaded', () => {
     void (async () => {
       const domain = domainInput.value.trim();
       const token = tokenInput.value.trim();
+      const defaultLabel = defaultLabelInput.value.trim() || 'marketing'; // Fallback to 'marketing' if empty
 
       if (!domain || !token) {
-        showStatusMessage('Both Domain and Token fields are required.', true);
+        showStatusMessage('Domain and Token fields are required.', true);
         return;
       }
 
       try {
-        await saveSettings({ domain, token });
+        const keyboardShortcuts = {
+          openPopup: popupShortcutInput.value.trim() || undefined,
+          fillCurrentField: fillShortcutInput.value.trim() || undefined,
+        };
+
+        await saveSettings({
+          domain,
+          token,
+          defaultLabel,
+          keyboardShortcuts,
+        });
         showStatusMessage('Settings saved successfully!');
       } catch (error) {
         const message =

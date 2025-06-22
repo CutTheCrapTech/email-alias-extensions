@@ -3,6 +3,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import vitest from 'eslint-plugin-vitest';
+import path from 'node:path';
 
 /**
  * @type {import('eslint').Linter.FlatConfig[]}
@@ -15,30 +16,31 @@ export default [
 
   // 2. Base configurations for all files
   js.configs.recommended,
-  ...tseslint.configs.recommended, // This is an array, spread into the top-level array. Correct.
+  ...tseslint.configs.recommended,
 
-  // 3. Configuration for TypeScript source code across all packages
-  // This section is now correctly split into two parts.
-
-  // Part A: Apply the recommended type-checked configs, scoped to the correct files.
-  // We map over the array of configs and add `files` and `ignores` to each one.
-  // The result is an array of new config objects, which is then correctly spread
-  // into the top-level configuration array.
+  // 3. TypeScript source code configuration
   ...tseslint.configs.recommendedTypeChecked.map((config) => ({
     ...config,
     files: ['packages/**/src/**/*.ts'],
     ignores: ['packages/**/src/__tests__/**/*.ts'],
+    languageOptions: {
+      ...config.languageOptions,
+      parserOptions: {
+        ...config.languageOptions?.parserOptions,
+        project: true,
+        tsconfigRootDir: path.resolve(import.meta.dirname),
+      },
+    },
   })),
 
-  // Part B: Add our own specific options and rules for the same set of files.
-  // This is a separate, single configuration object.
+  // 4. Project-specific TypeScript rules
   {
     files: ['packages/**/src/**/*.ts'],
     ignores: ['packages/**/src/__tests__/**/*.ts'],
     languageOptions: {
       parserOptions: {
         project: true,
-        tsconfigRootDir: import.meta.dirname,
+        tsconfigRootDir: path.resolve(import.meta.dirname),
       },
       globals: {
         ...globals.browser,
@@ -53,7 +55,7 @@ export default [
     },
   },
 
-  // 4. Configuration specifically for test files
+  // 5. Test configuration
   {
     files: ['packages/**/src/__tests__/**/*.ts'],
     plugins: {
@@ -69,7 +71,7 @@ export default [
     },
   },
 
-  // 5. Configuration for Node.js scripts (build script, config files)
+  // 6. Node.js scripts
   {
     files: ['scripts/**/*.mjs', 'eslint.config.js'],
     languageOptions: {
@@ -79,6 +81,6 @@ export default [
     },
   },
 
-  // 6. Prettier configuration must be the last item.
+  // 7. Prettier must be last
   eslintPluginPrettierRecommended,
 ];

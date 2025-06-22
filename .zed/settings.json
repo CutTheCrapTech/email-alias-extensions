@@ -10,7 +10,23 @@
       "code_actions_on_format": {
         "source.fixAll.eslint": true
       }
+    },
+    "TypeScript": {
+      "formatter": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--stdin-filepath", "{buffer_path}"]
+        }
+      },
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
     }
   },
-  "tab_size": 2
+  "tab_size": 2,
+  "eslint": {
+    "enable": true,
+    "working_directory": "{workspace_folder}",
+    "use_flat_config": true
+  }
 }

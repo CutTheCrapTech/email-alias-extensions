@@ -6,6 +6,11 @@ import browser from 'webextension-polyfill';
 export interface ExtensionSettings {
   domain?: string;
   token?: string;
+  defaultLabel?: string;
+  keyboardShortcuts?: {
+    openPopup?: string;
+    fillCurrentField?: string;
+  };
 }
 
 // A single key to store all settings under, to avoid cluttering the storage area.

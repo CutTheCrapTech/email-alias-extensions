@@ -32,9 +32,91 @@
       <input type="password" id="token" placeholder="Enter your secret token" />
     </div>
 
+    <div class="section">
+      <label for="default-label">
+        Default Label
+        <span
+          class="info-icon"
+          title="The default category that will be pre-filled when generating aliases (e.g., 'marketing', 'newsletter', 'signup')."
+          >i</span
+        >
+      </label>
+      <input type="text" id="default-label" placeholder="marketing" />
+    </div>
+
     <button id="save-btn">Save</button>
 
     <div id="status-message" class="hidden"></div>
+
+    <!-- Keyboard Shortcuts section -->
+    <div class="section keyboard-section">
+      <h2>Keyboard Shortcuts</h2>
+      <p>
+        Configure keyboard shortcuts for quick access to extension features:
+      </p>
+
+      <div class="shortcut-item">
+        <label for="popup-shortcut">
+          Open Extension Popup
+          <span
+            class="info-icon"
+            title="Keyboard shortcut to open the main extension popup for generating aliases."
+            >i</span
+          >
+        </label>
+        <div class="shortcut-input-container">
+          <input
+            type="text"
+            id="popup-shortcut"
+            placeholder="Ctrl+Shift+E"
+            readonly
+            class="shortcut-input"
+          />
+          <button id="record-popup-shortcut" class="record-btn">
+            Set Shortcut
+          </button>
+          <button id="clear-popup-shortcut" class="clear-btn">Clear</button>
+        </div>
+      </div>
+
+      <div class="shortcut-item">
+        <label for="fill-shortcut">
+          Fill Current Input Field
+          <span
+            class="info-icon"
+            title="Keyboard shortcut to automatically fill the currently focused email input field with a generated alias."
+            >i</span
+          >
+        </label>
+        <div class="shortcut-input-container">
+          <input
+            type="text"
+            id="fill-shortcut"
+            placeholder="Ctrl+Shift+A"
+            readonly
+            class="shortcut-input"
+          />
+          <button id="record-fill-shortcut" class="record-btn">
+            Set Shortcut
+          </button>
+          <button id="clear-fill-shortcut" class="clear-btn">Clear</button>
+        </div>
+      </div>
+
+      <div class="keyboard-help">
+        <p><strong>How to set shortcuts:</strong></p>
+        <ol>
+          <li>Click "Set Shortcut" button</li>
+          <li>Press your desired key combination (e.g., Ctrl+Shift+E)</li>
+          <li>The shortcut will be saved automatically</li>
+        </ol>
+        <p class="keyboard-note">
+          <strong>Note:</strong> Use modifier keys (Ctrl, Alt, Shift) with
+          letters or numbers. Some combinations may conflict with browser or
+          system shortcuts.
+        </p>
+      </div>
+    </div>
 
     <!-- Pin to toolbar section -->
     <div class="section pin-section">

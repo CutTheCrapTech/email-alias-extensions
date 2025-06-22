@@ -1,234 +1,403 @@
 /* --- Color Palette using CSS Custom Properties --- */
 :root {
   /* --- Light Theme (Default) --- */
-  --background-body: #f9f9f9;
-  --background-result: #e9ecef;
+  --background-body: #f8f9fa;
+  --background-card: #ffffff;
+  --background-input: #ffffff;
   --background-success: #d4edda;
-  --text-primary: #1a1a1a;
-  --text-secondary: #555;
-  --text-heading: #333;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-heading: #343a40;
   --text-success: #155724;
-  --text-error: #d93025;
-  --border-color: #ccc;
-  --border-result: #dee2e6;
+  --text-error: #dc3545;
+  --border-color: #dee2e6;
+  --border-focus: #86b7fe;
   --border-success: #c3e6cb;
-  --button-bg: #007bff;
-  --button-bg-hover: #0056b3;
-  --button-text: #fff;
-  --info-icon-bg: #aaa;
-  --info-icon-text: #fff;
+  --button-primary: #0d6efd;
+  --button-primary-hover: #0b5ed7;
+  --button-danger: #dc3545;
+  --button-danger-hover: #bb2d3b;
+  --button-secondary: #6c757d;
+  --button-secondary-hover: #5c636a;
+  --shadow: rgba(0, 0, 0, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
   /* --- Dark Theme Overrides --- */
   :root {
-    --background-body: #212529;
-    --background-result: #343a40;
-    --background-success: #14361f;
-    --text-primary: #f8f9fa;
-    --text-secondary: #adb5bd;
-    --text-heading: #ffffff;
-    --text-success: #8cffb4;
-    --text-error: #ff8a80;
-    --border-color: #495057;
-    --border-result: #495057;
-    --border-success: #195c31;
-    --button-bg: #0d6efd;
-    --button-bg-hover: #0b5ed7;
-    --button-text: #fff;
-    --info-icon-bg: #6c757d;
-    --info-icon-text: #fff;
+    --background-body: #1a1d23;
+    --background-card: #2d3748;
+    --background-input: #374151;
+    --background-success: #065f46;
+    --text-primary: #f7fafc;
+    --text-secondary: #a0aec0;
+    --text-heading: #e2e8f0;
+    --text-success: #6ee7b7;
+    --text-error: #f87171;
+    --border-color: #4a5568;
+    --border-focus: #63b3ed;
+    --border-success: #059669;
+    --button-primary: #3182ce;
+    --button-primary-hover: #2c5aa0;
+    --button-danger: #e53e3e;
+    --button-danger-hover: #c53030;
+    --button-secondary: #718096;
+    --button-secondary-hover: #4a5568;
+    --shadow: rgba(0, 0, 0, 0.3);
   }
 }
 
 /* --- Base Styles --- */
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
-    sans-serif;
-  width: 320px;
-  padding: 16px;
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  line-height: 1.6;
   color: var(--text-primary);
   background-color: var(--background-body);
+  margin: 0;
+  padding: 32px;
+  min-height: 100vh;
+}
+
+/* Options page layout */
+.options-container {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 h1 {
-  font-size: 1.5em;
-  margin-top: 0;
-  margin-bottom: 16px;
+  font-size: 2rem;
+  font-weight: 700;
   color: var(--text-heading);
+  margin: 0 0 2rem 0;
+  text-align: center;
 }
 
 h2 {
-  font-size: 1.2em;
-  margin-top: 24px;
-  margin-bottom: 12px;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: var(--text-heading);
+  margin: 0 0 1rem 0;
 }
 
+/* Card sections */
 .section {
-  margin-bottom: 16px;
+  background-color: var(--background-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: box-shadow 0.2s ease;
 }
 
+.section:hover {
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+/* Form elements */
 label {
   display: block;
-  margin-bottom: 6px;
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
 }
 
 input[type='text'],
 input[type='password'] {
-  width: calc(100% - 12px); /* Account for padding */
-  padding: 8px 6px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 1em;
-  background-color: var(--background-body);
-  color: var(--text-primary);
-}
-
-button {
-  display: inline-block;
-  padding: 10px 16px;
-  border: none;
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1em;
-  font-weight: 500;
-  text-align: center;
-  transition: background-color 0.2s ease-in-out;
-}
-
-button:hover {
-  background-color: var(--button-bg-hover);
-}
-
-button.full-width {
   width: 100%;
+  max-width: 400px;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: var(--background-input);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
 }
 
-.result-box {
-  display: flex;
-  justify-content: space-between;
+input[type='text']:focus,
+input[type='password']:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
   align-items: center;
-  margin-top: 8px;
-  padding: 10px;
-  background-color: var(--background-result);
-  border: 1px solid var(--border-result);
-  border-radius: 4px;
-  word-wrap: break-word;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-#alias-result {
-  flex-grow: 1;
-  margin-right: 10px;
-  font-family: 'Courier New', Courier, monospace;
+.btn-primary {
+  background-color: var(--button-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--button-primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background-color: var(--button-danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: var(--button-danger-hover);
+}
+
+.btn-secondary {
+  background-color: var(--button-secondary);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--button-secondary-hover);
+}
+
+#save-btn {
+  background-color: var(--button-primary);
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+#save-btn:hover {
+  background-color: var(--button-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+/* Status messages */
+#status-message {
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: var(--background-success);
+  color: var(--text-success);
+  border: 1px solid var(--border-success);
+  margin-top: 1rem;
+}
+
+.error {
+  color: var(--text-error);
+  background-color: rgba(220, 53, 69, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--text-error);
 }
 
 .hidden {
   display: none !important;
 }
 
-.error {
-  color: var(--text-error);
-  margin-top: 10px;
-}
-
-#status-message {
-  margin-top: 10px;
-  padding: 8px;
-  border-radius: 4px;
-  background-color: var(--background-success);
-  color: var(--text-success);
-  border: 1px solid var(--border-success);
-}
-
+/* Info icons */
 .info-icon {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  line-height: 14px;
-  text-align: center;
-  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
   font-weight: bold;
-  font-style: italic;
-  font-family: 'Georgia', serif;
-  color: var(--info-icon-text);
-  background-color: var(--info-icon-bg);
+  color: white;
+  background-color: var(--button-secondary);
   border-radius: 50%;
   cursor: help;
-  margin-left: 6px;
-  position: relative;
-  top: -1px;
+  margin-left: 0.5rem;
 }
 
-/* --- New styles for options page sections --- */
+.info-icon:hover {
+  background-color: var(--button-primary);
+}
+
+/* Keyboard shortcuts section */
+.keyboard-section {
+  background: linear-gradient(
+    135deg,
+    var(--background-card),
+    rgba(13, 110, 253, 0.05)
+  );
+}
+
+.shortcut-item {
+  background-color: var(--background-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.shortcut-input-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.shortcut-input {
+  flex: 1;
+  min-width: 200px;
+  max-width: 300px;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  background-color: var(--background-input);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.shortcut-input.recording {
+  background-color: #fff3cd;
+  border-color: #ffc107;
+  animation: pulse 1s infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  .shortcut-input.recording {
+    background-color: #664d03;
+    border-color: #ffc107;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.record-btn {
+  background-color: var(--button-primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.record-btn:hover {
+  background-color: var(--button-primary-hover);
+}
+
+.record-btn:disabled {
+  background-color: var(--button-secondary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.clear-btn {
+  background-color: var(--button-danger);
+  color: white;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.clear-btn:hover {
+  background-color: var(--button-danger-hover);
+}
+
+/* Help section */
+.keyboard-help {
+  background-color: var(--background-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.keyboard-help ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.keyboard-help li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.keyboard-note {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Pin and context menu sections */
 .pin-section,
 .context-menu-section {
-  margin-top: 32px;
-  padding: 16px;
-  background-color: var(--background-result);
-  border: 1px solid var(--border-result);
-  border-radius: 8px;
+  background: linear-gradient(
+    135deg,
+    var(--background-card),
+    rgba(108, 117, 125, 0.05)
+  );
 }
 
 .pin-instructions,
 .context-instructions {
-  margin: 12px 0;
-  padding-left: 20px;
+  margin: 1.5rem 0;
+  padding-left: 1.5rem;
 }
 
 .pin-instructions li,
 .context-instructions li {
-  margin-bottom: 8px;
-  line-height: 1.4;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
 }
 
 .puzzle-icon,
 .pin-icon {
-  font-size: 16px;
-  margin: 0 2px;
+  font-size: 1.2rem;
+  margin: 0 0.25rem;
 }
 
 .pin-note {
-  margin-top: 12px;
+  margin-top: 1.5rem;
   font-style: italic;
   color: var(--text-secondary);
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
 }
 
-/* --- Options page specific styles --- */
-body:has(h1:contains('Settings')) {
-  width: auto;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
-/* For Chrome/Edge that don't support :has() yet */
-@supports not (selector(:has(*))) {
-  .options-page {
-    width: auto;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 24px;
+/* Responsive design */
+@media (max-width: 768px) {
+  body {
+    padding: 1rem;
   }
-}
 
-/* Error message with button styling */
-#error-container button {
-  padding: 4px 8px;
-  font-size: 12px;
-  margin-left: 8px;
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-}
+  .section {
+    padding: 1.5rem;
+  }
 
-#error-container button:hover {
-  background-color: var(--button-bg-hover);
+  .shortcut-input-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .shortcut-input {
+    min-width: auto;
+    max-width: none;
+  }
 }

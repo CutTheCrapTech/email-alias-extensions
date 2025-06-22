@@ -17,6 +17,11 @@
   "workspaces": [
     "packages/*"
   ],
+  "engines": {
+    "node": "^18.0.0",
+    "npm": "^9.0.0",
+    "eslint": "^9.29.0"
+  },
   "devDependencies": {
     "esbuild": "^0.25.5",
     "eslint": "^9.29.0",
