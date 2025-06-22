@@ -1,12 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { generateEmailAlias } from '../api';
 import { loadSettings } from '../storage';
+import browser from 'webextension-polyfill';
 
 // --- Mocking Dependencies ---
 // For this integration test, we ONLY mock the storage module.
 // We want to use the REAL `email-alias-core` library to verify its output.
 vi.mock('../storage', () => ({
   loadSettings: vi.fn(),
+}));
+
+vi.mock('webextension-polyfill', () => ({
+  default: {
+    scripting: {
+      executeScript: vi.fn(),
+    },
+    tabs: {
+      sendMessage: vi.fn(),
+      query: vi.fn().mockResolvedValue([{ id: 1 }]),
+    },
+  },
 }));
 
 // --- Integration Test Suite ---
@@ -42,5 +55,42 @@ describe('API Module Integration with email-alias-core', () => {
 
     // Also verify that the storage module was called as expected.
     expect(loadSettings).toHaveBeenCalledOnce();
+  });
+
+  describe('Content Script Injection', () => {
+    it('should handle injection failures gracefully', async () => {
+      vi.mocked(browser.scripting.executeScript).mockRejectedValue(
+        new Error('Injection failed')
+      );
+      const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+
+      // Add explicit check for tab.id
+      if (!tab || typeof tab.id !== 'number') {
+        throw new Error('No active tab found or tab id is missing');
+      }
+
+      await expect(
+        browser.scripting.executeScript({
+          target: { tabId: tab.id }, // Now tab.id is guaranteed to be number
+          files: ['dialog.js'],
+        })
+      ).rejects.toThrow('Injection failed');
+    });
+
+    it('should verify content script communication', async () => {
+      vi.mocked(browser.tabs.sendMessage).mockResolvedValue({ success: true });
+      const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+      if (!tab) throw new Error('No active tab found');
+      const response = await browser.tabs.sendMessage(tab.id!, {
+        type: 'ping',
+      });
+      expect(response).toEqual({ success: true });
+    });
   });
 });

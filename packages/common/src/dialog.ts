@@ -160,7 +160,7 @@ function isEmailInput(element: HTMLInputElement): boolean {
  * Finds all email input fields on the page.
  * @returns Array of HTMLInputElement that are email fields.
  */
-function findAllEmailInputs(): HTMLInputElement[] {
+export function findAllEmailInputs(): HTMLInputElement[] {
   const inputs = Array.from(document.querySelectorAll('input'));
   return inputs.filter(isEmailInput);
 }
@@ -169,7 +169,7 @@ function findAllEmailInputs(): HTMLInputElement[] {
  * Finds the most likely email input field on the page using a scoring system.
  * @returns The best HTMLInputElement or null if none is found.
  */
-function findBestEmailInput(): HTMLInputElement | null {
+export function findBestEmailInput(): HTMLInputElement | null {
   const emailInputs = findAllEmailInputs();
 
   if (emailInputs.length === 0) return null;

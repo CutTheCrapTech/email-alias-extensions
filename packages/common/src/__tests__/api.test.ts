@@ -123,15 +123,40 @@ describe('API Module: generateEmailAlias', () => {
       vi.mocked(coreGenerateAlias).mockRejectedValue(coreError);
 
       // Act & Assert
-      try {
-        await generateEmailAlias(['test', 'case']);
-        expect.fail('Expected function to throw');
-      } catch (error) {
-        expect(error).toBeInstanceOf(ApiError);
-        expect((error as ApiError).message).toBe(
-          `Failed to generate alias: ${coreError.message}`
-        );
-      }
+      await expect(generateEmailAlias(['test', 'case'])).rejects.toThrow(
+        `Failed to generate alias: ${coreError.message}`
+      );
+    });
+
+    it('should handle special characters in alias parts', async () => {
+      vi.mocked(loadSettings).mockResolvedValue({
+        domain: 'example.com',
+        token: 'secret',
+      });
+      await expect(
+        generateEmailAlias(['shopping!', 'amazon$'])
+      ).rejects.toThrow('Failed to generate alias: Invalid character in token');
+    });
+
+    it('should handle very long alias parts', async () => {
+      vi.mocked(loadSettings).mockResolvedValue({
+        domain: 'example.com',
+        token: 'secret',
+      });
+      const longString = 'a'.repeat(100);
+      await expect(generateEmailAlias([longString, 'service'])).rejects.toThrow(
+        'Failed to generate alias: Invalid character in token'
+      );
+    });
+
+    it('should reject invalid tokens', async () => {
+      vi.mocked(loadSettings).mockResolvedValue({
+        domain: 'example.com',
+        token: 'short', // Too short
+      });
+      await expect(generateEmailAlias(['test', 'case'])).rejects.toThrow(
+        'Failed to generate alias'
+      );
     });
   });
 });

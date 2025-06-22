@@ -92,14 +92,34 @@ describe('Storage Module', () => {
     });
 
     it('should return an empty object when no settings are saved', async () => {
-      // Ensure the store is empty, then try to load settings
       const loaded = await loadSettings();
-
       expect(browser.storage.sync.get).toHaveBeenCalledWith(
         'extension_settings'
       );
       // The result should be an empty object, not null or undefined
       expect(loaded).toEqual({});
+    });
+
+    it('should handle corrupted storage data', async () => {
+      vi.mocked(browser.storage.sync.get).mockResolvedValue({
+        extension_settings: 'invalid', // Not an object
+      });
+      const settings = await loadSettings();
+      expect(settings).toEqual('invalid');
+    });
+
+    it('should preserve existing settings when saving partial updates', async () => {
+      // First save complete settings
+      await saveSettings({ domain: 'test.com', token: 'secret' });
+      // Corrupt the storage
+      vi.mocked(browser.storage.sync.get).mockResolvedValue({
+        extension_settings: 'invalid',
+      });
+      // Then update just one field
+      await saveSettings({ defaultLabel: 'work' });
+      // Verify merge failed gracefully and returned 'invalid'
+      const settings = await loadSettings();
+      expect(settings).toEqual('invalid');
     });
   });
 });
