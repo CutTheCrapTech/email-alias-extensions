@@ -122,7 +122,3 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
-> [!CAUTION]
->
-> Store your token securely in your password manager. You will need it to validate generated aliases in cloudflare workers. And more importantly if you lose it, you will not be able to validate the aliases generated going forward. You will not stop receiveing emails as such but spam protection on catchall becomes useless. I can't stress this enough, store it securely in your password manager.
