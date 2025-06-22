@@ -5,48 +5,57 @@
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
+  <body class="options-page">
     <h1>Settings</h1>
 
+    <!-- Combined settings section -->
     <div class="section">
-      <label for="domain">
-        Domain
-        <span
-          class="info-icon"
-          title="The domain you own where the aliases will be created, e.g., 'your-domain.com'."
-          >i</span
-        >
-      </label>
-      <input type="text" id="domain" placeholder="your-domain.com" />
+      <h2>Configuration</h2>
+
+      <div class="form-group">
+        <label for="domain">
+          Domain
+          <span
+            class="info-icon"
+            title="The domain you own where the aliases will be created, e.g., 'your-domain.com'."
+            >i</span
+          >
+        </label>
+        <input type="text" id="domain" placeholder="your-domain.com" />
+      </div>
+
+      <div class="form-group">
+        <label for="token">
+          Secret Token
+          <span
+            class="info-icon"
+            title="The secret key used to generate unique, secure aliases. Keep this safe!"
+            >i</span
+          >
+        </label>
+        <input
+          type="password"
+          id="token"
+          placeholder="Enter your secret token"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="default-label">
+          Default Label
+          <span
+            class="info-icon"
+            title="The default category that will be pre-filled when generating aliases (e.g., 'marketing', 'newsletter', 'signup')."
+            >i</span
+          >
+        </label>
+        <input type="text" id="default-label" placeholder="marketing" />
+      </div>
+
+      <button id="save-btn">Save</button>
+
+      <div id="status-message" class="hidden"></div>
     </div>
-
-    <div class="section">
-      <label for="token">
-        Secret Token
-        <span
-          class="info-icon"
-          title="The secret key used to generate unique, secure aliases. Keep this safe!"
-          >i</span
-        >
-      </label>
-      <input type="password" id="token" placeholder="Enter your secret token" />
-    </div>
-
-    <div class="section">
-      <label for="default-label">
-        Default Label
-        <span
-          class="info-icon"
-          title="The default category that will be pre-filled when generating aliases (e.g., 'marketing', 'newsletter', 'signup')."
-          >i</span
-        >
-      </label>
-      <input type="text" id="default-label" placeholder="marketing" />
-    </div>
-
-    <button id="save-btn">Save</button>
-
-    <div id="status-message" class="hidden"></div>
 
     <!-- Keyboard Shortcuts section -->
     <div class="section keyboard-section">

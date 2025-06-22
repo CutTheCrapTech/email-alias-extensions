@@ -1,5 +1,6 @@
 import browser from 'webextension-polyfill';
 import { ApiError, generateEmailAlias } from './api';
+import { extractDomainForSource, getDefaultLabel } from './domain';
 
 // Interfaces for messaging between background and content scripts
 interface ShowAliasDialogMessage {
@@ -97,32 +98,6 @@ browser.runtime.onMessage.addListener(
     return true; // Indicate we handled the message
   }
 );
-
-/**
- * Extracts a clean domain name from the current page's URL to be used as the 'source'.
- * Returns the part immediately before the TLD (top-level domain).
- * @returns The extracted domain name (e.g., "google", "amazonaws") or an empty string.
- */
-function extractDomainForSource(): string {
-  try {
-    const hostname = window.location.hostname;
-    // Remove common subdomains like 'www.'
-    const domain = hostname.replace(/^(www\.)/, '');
-    const parts = domain.split('.');
-
-    // For domains like "example.com" -> return "example"
-    // For domains like "s3.amazonaws.com" -> return "amazonaws"
-    // For domains like "subdomain.example.co.uk" -> return "example"
-    if (parts.length >= 2) {
-      return parts[parts.length - 2] || '';
-    }
-
-    return parts[0] || '';
-  } catch (error) {
-    console.error('Error extracting domain for source:', error);
-    return '';
-  }
-}
 
 /**
  * A comprehensive check to determine if an input element is an email field.
@@ -329,9 +304,9 @@ async function showAliasGenerationDialog(): Promise<void> {
     document.head.appendChild(style);
     document.body.appendChild(dialog);
 
-    // Auto-fill values
-    const autoSource = extractDomainForSource();
-    const autoLabel = 'marketing'; // Default label
+    // Auto-fill values using shared utilities
+    const autoSource = extractDomainForSource(); // Uses current page's URL
+    const autoLabel = await getDefaultLabel(); // Gets from storage or default
 
     // Get dialog elements
     const labelInput = dialog.querySelector('#alias-label') as HTMLInputElement;
@@ -542,12 +517,14 @@ async function showAliasGenerationDialog(): Promise<void> {
       });
     });
 
-    // Focus the first empty input or the source input if both are pre-filled
-    if (!autoLabel) {
+    // Focus logic: if we auto-filled both, focus source for easy editing
+    if (autoLabel && autoSource) {
+      sourceInput.focus();
+      sourceInput.select();
+    } else if (!autoLabel) {
       labelInput.focus();
     } else {
       sourceInput.focus();
-      sourceInput.select();
     }
   } catch (error) {
     console.error('Failed to create or show alias generation dialog:', error);

@@ -56,25 +56,41 @@ body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
     Arial, sans-serif;
-  line-height: 1.6;
+  line-height: 1.4;
   color: var(--text-primary);
   background-color: var(--background-body);
   margin: 0;
-  padding: 32px;
-  min-height: 100vh;
+  padding: 16px;
+  width: 320px;
+  min-height: auto;
 }
 
-/* Options page layout */
+/* Options page layout - Applied when body has options-page class */
+body.options-page {
+  width: auto;
+  max-width: 70%;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+body.options-page .section {
+  margin-bottom: 2rem;
+}
+
+body.options-page .section:last-child {
+  margin-bottom: 0;
+}
+
 .options-container {
   max-width: 800px;
   margin: 0 auto;
 }
 
 h1 {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.3rem;
+  font-weight: 600;
   color: var(--text-heading);
-  margin: 0 0 2rem 0;
+  margin: 0 0 1rem 0;
   text-align: center;
 }
 
@@ -89,15 +105,19 @@ h2 {
 .section {
   background-color: var(--background-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 8px var(--shadow);
-  transition: box-shadow 0.2s ease;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0;
+  box-shadow: 0 1px 3px var(--shadow);
 }
 
-.section:hover {
-  box-shadow: 0 4px 12px var(--shadow);
+/* Form groups for better spacing */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group:last-of-type {
+  margin-bottom: 0;
 }
 
 /* Form elements */
@@ -112,15 +132,13 @@ label {
 input[type='text'],
 input[type='password'] {
   width: 100%;
-  max-width: 400px;
-  padding: 0.75rem 1rem;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.9rem;
   background-color: var(--background-input);
   color: var(--text-primary);
-  transition: all 0.2s ease;
-  margin-bottom: 1rem;
+  transition: border-color 0.2s ease;
 }
 
 input[type='text']:focus,
@@ -179,6 +197,7 @@ button {
   color: white;
   padding: 1rem 2rem;
   font-size: 1.1rem;
+  margin-bottom: 1rem;
 }
 
 #save-btn:hover {
@@ -194,22 +213,19 @@ button {
   background-color: var(--background-success);
   color: var(--text-success);
   border: 1px solid var(--border-success);
-  margin-top: 1rem;
 }
 
 .error {
-  color: var(--text-error);
-  background-color: rgba(220, 53, 69, 0.1);
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--text-error);
+  color: var(--text-error) !important;
+  background-color: rgba(220, 53, 69, 0.1) !important;
+  border-color: var(--text-error) !important;
 }
 
 .hidden {
   display: none !important;
 }
 
-/* Info icons */
+/* Info icons - Fixed tooltip functionality */
 .info-icon {
   display: inline-flex;
   align-items: center;
@@ -223,10 +239,57 @@ button {
   border-radius: 50%;
   cursor: help;
   margin-left: 0.5rem;
+  position: relative;
 }
 
 .info-icon:hover {
   background-color: var(--button-primary);
+}
+
+/* Tooltip styles */
+.info-icon::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--text-primary);
+  color: var(--background-card);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: normal;
+  white-space: nowrap;
+  max-width: 200px;
+  white-space: normal;
+  width: max-content;
+  max-width: 250px;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.info-icon:hover::after {
+  opacity: 1;
+}
+
+/* Tooltip arrow */
+.info-icon::before {
+  content: '';
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--text-primary);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.info-icon:hover::before {
+  opacity: 1;
 }
 
 /* Keyboard shortcuts section */
@@ -381,6 +444,51 @@ button {
   border-top: 1px solid var(--border-color);
 }
 
+/* Result box for popup */
+.result-box {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.6rem;
+  background-color: var(--background-input);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+#alias-result {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+#copy-btn {
+  background-color: var(--button-secondary);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+#copy-btn:hover {
+  background-color: var(--button-secondary-hover);
+}
+
+#generate-btn {
+  background-color: var(--button-primary);
+  color: white;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+#generate-btn:hover {
+  background-color: var(--button-primary-hover);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   body {
@@ -399,5 +507,14 @@ button {
   .shortcut-input {
     min-width: auto;
     max-width: none;
+  }
+
+  .result-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #copy-btn {
+    width: 100%;
   }
 }

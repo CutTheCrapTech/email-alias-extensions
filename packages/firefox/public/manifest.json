@@ -25,13 +25,19 @@
       "run_at": "document_idle"
     }
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["dialog.html", "dialog.css"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png"
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "alias-generator@example.com",
+      "id": "c0d19e6e-8cae-4e93-b5dc-4cf1b57805c8",
       "strict_min_version": "109.0"
     }
   }

@@ -24,9 +24,6 @@
     }
   },
   "tab_size": 2,
-  "eslint": {
-    "enable": true,
-    "working_directory": "{workspace_folder}",
-    "use_flat_config": true
-  }
+  "format_on_save": "on",
+  "auto_save": "on_focus_change"
 }

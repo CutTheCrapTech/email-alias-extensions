@@ -6,80 +6,117 @@ This project provides a browser extension that allows you to quickly generate un
 
 ## Features
 
-- Generate strong, unique email aliases directly in your browser.
-- Securely store your secret token using the browser's local storage.
-- Simple, intuitive interface for quick alias generation.
-- Cross-browser support (Chrome & Firefox).
-- Zero external runtime dependencies for the core logic.
+- **Secure Alias Generation**: Generate strong, unique email aliases directly in your browser.
+- **Tracker-Free Emails**: Designed to work with services like [Cloudflare Workers](#integration-with-cloudflare-workers) to clean email trackers.
+- **Cross-Browser Support**: Works seamlessly on Chrome & Firefox.
+- **Zero External Dependencies**: Core logic is self-contained for reliability.
+- **Easy Storage**: Securely store your secret token and domain in the browser's local storage.
+- **Context Menu Integration**: Quickly generate aliases from any webpage.
+
+## Use Cases
+
+1. **Avoid Spam**: Use unique aliases for each service to prevent spam.
+2. **Privacy Protection**: Mask your primary email address for enhanced privacy.
+3. **Tracker Cleaning**: Integrate with [Cloudflare Workers](#integration-with-cloudflare-workers) to strip email trackers and protect from spam on catch all addresses.
 
 ## Project Structure
 
-This repository is a monorepo managed with npm workspaces.
+This repository is a monorepo managed with npm workspaces:
 
-- `packages/common`: Shared TypeScript code used by both extensions, including the core logic for alias generation and storage.
-- `packages/chrome`: Contains the manifest, UI files (`popup.html`, `popup.js`), and build script specific to the Chrome extension.
-- `packages/firefox`: Contains the manifest and build script specific to the Firefox extension. It reuses UI assets from the `chrome` package to avoid code duplication.
+- `packages/common`: Shared TypeScript code for alias generation and storage.
+- `packages/chrome`: Chrome extension manifest.
+- `packages/firefox`: Firefox extension manifest.
 
-## Development
+## Installation
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18 or later is recommended)
+- [Node.js](https://nodejs.org/) (v22 or later recommended)
 - [npm](https://www.npmjs.com/) (v9 or later)
 
 ### Setup
 
-1.  **Clone the repository:**
+1. Clone the repository:
 
-    ```bash
-    git clone https://github.com/karteekiitg/email-alias-extensions.git
-    cd email-alias-extensions
-    ```
+   ```bash
+   git clone https://github.com/karteekiitg/email-alias-extensions.git
+   cd email-alias-extensions
 
-2.  **Install dependencies:**
-    This command installs dependencies for all packages in the monorepo from the root directory.
-    ```bash
-    npm install
-    ```
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
 ### Build
 
-To build the extensions for both Chrome and Firefox, run the following command from the root of the project:
+To build the extensions for Chrome and Firefox:
 
 ```bash
 npm run build
 ```
 
-This will create a `dist` directory inside `packages/chrome` and `packages/firefox`, containing the unpacked extension files ready for installation.
-
-For active development, you can use the watch command to automatically rebuild the extensions whenever you make changes to the source files:
+For development with live reloading:
 
 ```bash
 npm run watch
 ```
 
-## Installation
-
-After building the extension, you can load it into your browser for development and testing.
+## Browser Installation
 
 ### Chrome
 
-1.  Open Chrome and navigate to `chrome://extensions`.
-2.  Enable **Developer mode** using the toggle switch in the top-right corner.
-3.  Click the **Load unpacked** button.
-4.  Select the `email-alias-extensions/packages/chrome/dist` directory.
+1. Navigate to `chrome://extensions`.
+2. Enable **Developer mode**.
+3. Click **Load unpacked** and select `dist/chrome`.
 
 ### Firefox
 
-1.  Open Firefox and navigate to `about:debugging`.
-2.  Click on the **This Firefox** tab in the sidebar.
-3.  Click the **Load Temporary Add-on...** button.
-4.  Navigate to the `email-alias-extensions/packages/firefox/dist` directory and select the `manifest.json` file.
+1. Navigate to `about:debugging`.
+2. Click **This Firefox** > **Load Temporary Add-on**.
+3. Select `dist/firefox/manifest.json`.
 
-## How to Use
+## Usage
 
-1.  Click on the extension icon in your browser's toolbar to open the popup.
-2.  In the **Settings** section, enter your secret token (or password) and click **Save**. This token is what you'll use to generate aliases and is stored securely in your browser's local storage.
-3.  In the generator section at the top, enter a prefix for the alias. This is typically the name of the website you're signing up for (e.g., `github.com`).
-4.  Click **Generate**.
-5.  The generated alias will appear below. Click the **Copy** button to copy it to your clipboard. You can now use this alias to sign up for services.
+1. **Configure Settings**:
+
+   - Open the extension's **Options** page.
+   - Enter your secret token and domain (e.g., `example.com`).
+   - Click **Save**.
+
+   > [!CAUTION] > **Store your token securely in your password manager. You will need it to validate generated aliases in cloudflare workers. And more importantly if you lose it, you will not be able to validate the aliases generated going forward. You will not stop receiveing emails as such but spam protection on catchall becomes useless. I can't stress this enough, store it securely in your password manager.**
+
+2. **Generate Aliases**:
+
+   - Click the extension icon in the toolbar.
+   - Enter a label (e.g., `shopping`) and source (e.g., `amazon.com`).
+   - Click **Generate** and copy the alias.
+
+3. **Context Menu**:
+
+   - Right-click on any webpage to generate an alias for the current domain.
+
+4. **Shortcuts**:
+   - Use the keyboard shortcuts setup on the options page to directly generate email aliases.
+
+## Integration with Cloudflare Workers
+
+This extension pairs perfectly with a Cloudflare Workers setup to:
+
+- Validate incoming emails.
+- Clean email trackers for enhanced privacy (similar to duckduckgo email).
+- Forward emails to your primary address.
+- Eliminate spam even when using catchall addresses.
+
+Note: Alternately, you can use any service that supports custom domains and catch-all addresses (like protonmail, etc), but you'd lose the email cleaning and the eliminate spam features (as the incoming emails are not screened at entry point).
+
+**TODO**: Add link to Cloudflare Workers repo once available.
+
+## Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss the changes.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

@@ -1,4 +1,5 @@
 import { generateEmailAlias, ApiError } from './api';
+import { extractDomainForSource, getDefaultLabel } from './domain';
 import browser from 'webextension-polyfill';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -44,6 +45,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return;
   }
+
+  // --- Auto-fill Logic ---
+  const initializeAutoFill = async () => {
+    try {
+      // Get current active tab to extract domain from
+      const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+
+      let autoSource = '';
+      if (tab?.url) {
+        autoSource = extractDomainForSource(tab.url);
+      }
+
+      // Get default label
+      const autoLabel = await getDefaultLabel();
+
+      // Set auto-filled values with defaults
+      if (labelInput && autoLabel) {
+        labelInput.value = autoLabel;
+        labelInput.defaultValue = autoLabel;
+      }
+
+      if (sourceInput && autoSource) {
+        sourceInput.value = autoSource;
+        sourceInput.defaultValue = autoSource;
+      }
+
+      // Focus logic: if we auto-filled both, focus source for easy editing
+      // If only one is filled, focus the empty one
+      if (autoLabel && autoSource) {
+        sourceInput.focus();
+        sourceInput.select();
+      } else if (autoLabel && !autoSource) {
+        sourceInput.focus();
+      } else if (!autoLabel && autoSource) {
+        labelInput.focus();
+      } else {
+        // Neither auto-filled, focus label first
+        labelInput.focus();
+      }
+    } catch (error) {
+      console.error('Error during auto-fill initialization:', error);
+      // Don't show this as an error to user, just log it
+      // Still focus the first input
+      labelInput.focus();
+    }
+  };
 
   // --- UI Helper Functions ---
 
@@ -178,4 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   labelInput.addEventListener('keydown', onEnterPress);
   sourceInput.addEventListener('keydown', onEnterPress);
+
+  // --- Initialize Auto-fill ---
+  void initializeAutoFill();
 });
