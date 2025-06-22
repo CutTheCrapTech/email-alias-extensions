@@ -63,7 +63,14 @@ function isContentMessage(message: unknown): message is ContentMessage {
   );
 }
 
-// Listener for messages from the background script
+/**
+ * Handles messages from the background script and other extension components.
+ * Processes different message types and responds appropriately.
+ * @param message The incoming message to handle
+ * @param _sender Information about the sender (unused)
+ * @param sendResponse Callback function to send a response
+ * @returns True to indicate the response will be sent asynchronously
+ */
 browser.runtime.onMessage.addListener(
   (
     message: unknown,

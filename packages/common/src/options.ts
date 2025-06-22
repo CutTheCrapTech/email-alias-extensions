@@ -91,6 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /**
    * Loads the current settings from storage and populates the input fields.
+   * Handles both domain/token configuration and keyboard shortcuts.
+   * Displays error messages if loading fails.
+   * @returns Promise that resolves when settings are loaded and displayed
    */
   async function loadAndDisplaySettings(): Promise<void> {
     try {
@@ -117,7 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /**
    * Handles the save button click event.
-   * It retrieves values from the inputs, saves them, and provides feedback.
+   * Validates inputs, saves settings to storage, and provides user feedback.
+   * Shows success/error messages and handles keyboard shortcut configuration.
    */
   saveButton.addEventListener('click', () => {
     // This is an async IIFE (Immediately Invoked Function Expression).

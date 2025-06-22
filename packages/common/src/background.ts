@@ -52,6 +52,11 @@ browser.runtime.onInstalled.addListener((details) => {
   });
 });
 
+/**
+ * Type guard to check if an object is a valid ping response.
+ * @param obj The object to check
+ * @returns True if the object matches the ping response structure
+ */
 function isPingResponse(obj: unknown): obj is { success?: boolean } {
   return (
     typeof obj === 'object' &&
@@ -60,7 +65,11 @@ function isPingResponse(obj: unknown): obj is { success?: boolean } {
   );
 }
 
-// Helper function to check if content script is available on a tab
+/**
+ * Checks if the content script is available on a given tab.
+ * @param tabId The ID of the tab to check
+ * @returns Promise that resolves to true if content script is available
+ */
 async function isContentScriptAvailable(tabId: number): Promise<boolean> {
   try {
     const response: unknown = await browser.tabs.sendMessage(tabId, {
@@ -73,7 +82,11 @@ async function isContentScriptAvailable(tabId: number): Promise<boolean> {
   }
 }
 
-// Helper function to inject content script if needed
+/**
+ * Ensures the content script is loaded on a tab, injecting it if necessary.
+ * @param tabId The ID of the tab to check/inject
+ * @returns Promise that resolves to true if script is loaded successfully
+ */
 async function ensureContentScriptLoaded(tabId: number): Promise<boolean> {
   try {
     // First check if it's already loaded
@@ -97,6 +110,11 @@ async function ensureContentScriptLoaded(tabId: number): Promise<boolean> {
   }
 }
 
+/**
+ * Type guard to check if an object is a valid EmailFieldsResponse.
+ * @param obj The object to check
+ * @returns True if the object matches the EmailFieldsResponse structure
+ */
 function isEmailFieldsResponse(obj: unknown): obj is EmailFieldsResponse {
   return (
     typeof obj === 'object' &&
@@ -192,7 +210,11 @@ interface PingMessage {
   type: 'ping';
 }
 
-// Type guard for ping message
+/**
+ * Type guard to check if a message is a PingMessage.
+ * @param message The message to check
+ * @returns True if the message is a PingMessage
+ */
 function isPingMessage(message: unknown): message is PingMessage {
   return (
     typeof message === 'object' &&
@@ -202,7 +224,11 @@ function isPingMessage(message: unknown): message is PingMessage {
   );
 }
 
-// Type guard to check if message is a valid ExtensionMessage
+/**
+ * Type guard to check if a message is a valid ExtensionMessage.
+ * @param message The message to check
+ * @returns True if the message is an ExtensionMessage
+ */
 function isExtensionMessage(message: unknown): message is ExtensionMessage {
   return (
     typeof message === 'object' &&

@@ -47,6 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Auto-fill Logic ---
+  /**
+   * Initializes auto-fill values for label and source inputs based on current tab and saved settings.
+   * Also handles focus logic for the input fields.
+   */
   const initializeAutoFill = async () => {
     try {
       // Get current active tab to extract domain from
@@ -97,6 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- UI Helper Functions ---
 
+  /**
+   * Displays an error message in the UI with optional settings button.
+   * @param message The error message to display
+   * @param showOptionsButton Whether to show a button to open settings
+   */
   const showError = (message: string, showOptionsButton = false) => {
     errorContainer.innerHTML = showOptionsButton
       ? `${message} <button id="open-options-btn" style="margin-left: 8px;">Open Settings</button>`
@@ -116,6 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  /**
+   * Hides any currently displayed error message.
+   */
   const hideError = () => {
     if (!errorContainer.classList.contains('hidden')) {
       errorContainer.classList.add('hidden');
@@ -123,6 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  /**
+   * Displays the generated alias in the result container.
+   * @param alias The generated email alias to display
+   */
   const showResult = (alias: string) => {
     aliasResultSpan.textContent = alias;
     resultContainer.classList.remove('hidden');
@@ -130,6 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // --- Auto-fill functionality ---
+  /**
+   * Attempts to fill the currently focused email field on the active tab.
+   * @param alias The email alias to fill into the field
+   */
   const fillActiveEmailField = async (alias: string) => {
     try {
       const [tab] = await browser.tabs.query({
@@ -153,6 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Core Async Logic ---
 
+  /**
+   * Handles the alias generation process including validation, API call, and result display.
+   */
   const handleGeneration = async () => {
     const label = labelInput.value.trim();
     const source = sourceInput.value.trim();
@@ -191,6 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  /**
+   * Handles copying the generated alias to clipboard.
+   */
   const handleCopy = async () => {
     const alias = aliasResultSpan.textContent;
     if (!alias) return;
@@ -219,6 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
     void handleCopy();
   });
 
+  /**
+   * Handles Enter key press to trigger alias generation.
+   * @param event The keyboard event
+   */
   const onEnterPress = (event: KeyboardEvent) => {
     if (event.key === 'Enter') {
       event.preventDefault();
