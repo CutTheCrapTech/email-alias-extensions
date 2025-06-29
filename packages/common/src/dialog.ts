@@ -1,19 +1,19 @@
-import browser from 'webextension-polyfill';
-import { ApiError, generateEmailAlias } from './api';
-import { extractDomainForSource, getDefaultLabel } from './domain';
+import browser from "webextension-polyfill";
+import { ApiError, generateEmailAlias } from "./api";
+import { extractDomainForSource, getDefaultLabel } from "./domain";
 
 // Interfaces for messaging between background and content scripts
 interface ShowAliasDialogMessage {
-  type: 'show-alias-dialog';
+  type: "show-alias-dialog";
 }
 
 interface FillEmailFieldMessage {
-  type: 'fill-email-field';
+  type: "fill-email-field";
   alias: string;
 }
 
 interface CheckEmailFieldsMessage {
-  type: 'check-email-fields';
+  type: "check-email-fields";
 }
 
 interface EmailFieldsResponse {
@@ -34,7 +34,7 @@ type MessageResponse = SuccessResponse | ErrorResponse | EmailFieldsResponse;
 
 // Define ping message type
 interface PingMessage {
-  type: 'ping';
+  type: "ping";
 }
 
 type ContentMessage =
@@ -50,15 +50,15 @@ type ContentMessage =
  */
 function isContentMessage(message: unknown): message is ContentMessage {
   return (
-    typeof message === 'object' &&
+    typeof message === "object" &&
     message !== null &&
-    'type' in message &&
-    typeof (message as { type: unknown }).type === 'string' &&
+    "type" in message &&
+    typeof (message as { type: unknown }).type === "string" &&
     [
-      'show-alias-dialog',
-      'fill-email-field',
-      'check-email-fields',
-      'ping',
+      "show-alias-dialog",
+      "fill-email-field",
+      "check-email-fields",
+      "ping",
     ].includes((message as { type: string }).type)
   );
 }
@@ -75,21 +75,21 @@ browser.runtime.onMessage.addListener(
   (
     message: unknown,
     _sender,
-    sendResponse: (response: MessageResponse) => void
+    sendResponse: (response: MessageResponse) => void,
   ) => {
     if (isContentMessage(message)) {
-      if (message.type === 'ping') {
+      if (message.type === "ping") {
         sendResponse({ success: true });
         return true; // Indicate we handled the message
-      } else if (message.type === 'show-alias-dialog') {
+      } else if (message.type === "show-alias-dialog") {
         void showAliasGenerationDialog();
         sendResponse({ success: true });
         return true; // Indicate we handled the message
-      } else if (message.type === 'fill-email-field') {
+      } else if (message.type === "fill-email-field") {
         fillEmailField(message.alias);
         sendResponse({ success: true });
         return true; // Indicate we handled the message
-      } else if (message.type === 'check-email-fields') {
+      } else if (message.type === "check-email-fields") {
         // Check if there are email fields on the page
         const emailInputs = findAllEmailInputs();
         const response: EmailFieldsResponse = {
@@ -101,9 +101,9 @@ browser.runtime.onMessage.addListener(
     }
 
     // For unknown messages, send error response
-    sendResponse({ success: false, error: 'Unknown message type' });
+    sendResponse({ success: false, error: "Unknown message type" });
     return true; // Indicate we handled the message
-  }
+  },
 );
 
 /**
@@ -127,27 +127,27 @@ function isEmailInput(element: HTMLInputElement): boolean {
   const name = element.name.toLowerCase();
   const placeholder = element.placeholder.toLowerCase();
   const autocomplete = (
-    element.getAttribute('autocomplete') || ''
+    element.getAttribute("autocomplete") || ""
   ).toLowerCase();
   const className = element.className.toLowerCase();
 
   // Primary check: type="email" is a strong indicator.
-  if (type === 'email') {
+  if (type === "email") {
     return true;
   }
 
   // Check autocomplete attribute, which is a modern standard.
-  if (autocomplete.includes('email') || autocomplete === 'username') {
+  if (autocomplete.includes("email") || autocomplete === "username") {
     return true;
   }
 
   // For type="text" or other types, check common naming conventions.
-  const keywords = ['email', 'e-mail', 'mail', 'login', 'user', 'username'];
+  const keywords = ["email", "e-mail", "mail", "login", "user", "username"];
   const searchString = `${id} ${name} ${placeholder} ${className}`;
 
   if (keywords.some((keyword) => searchString.includes(keyword))) {
     // Avoid password fields that might contain 'user'
-    if (type === 'password') {
+    if (type === "password") {
       return false;
     }
     return true;
@@ -161,7 +161,7 @@ function isEmailInput(element: HTMLInputElement): boolean {
  * @returns Array of HTMLInputElement that are email fields.
  */
 export function findAllEmailInputs(): HTMLInputElement[] {
-  const inputs = Array.from(document.querySelectorAll('input'));
+  const inputs = Array.from(document.querySelectorAll("input"));
   return inputs.filter(isEmailInput);
 }
 
@@ -184,7 +184,7 @@ export function findBestEmailInput(): HTMLInputElement | null {
     let score = 0;
 
     // Higher score for type="email"
-    if (input.type.toLowerCase() === 'email') {
+    if (input.type.toLowerCase() === "email") {
       score += 10;
     }
 
@@ -200,21 +200,21 @@ export function findBestEmailInput(): HTMLInputElement | null {
 
     // Higher score for inputs with email-specific autocomplete
     const autocomplete = (
-      input.getAttribute('autocomplete') || ''
+      input.getAttribute("autocomplete") || ""
     ).toLowerCase();
-    if (autocomplete.includes('email')) {
+    if (autocomplete.includes("email")) {
       score += 7;
     }
 
     // Higher score for inputs with specific names/ids
     const id = input.id.toLowerCase();
     const name = input.name.toLowerCase();
-    if (id.includes('email') || name.includes('email')) {
+    if (id.includes("email") || name.includes("email")) {
       score += 6;
     }
 
     // Prefer inputs that are in forms (more likely to be actual form fields)
-    if (input.closest('form')) {
+    if (input.closest("form")) {
       score += 3;
     }
 
@@ -242,8 +242,8 @@ function fillEmailField(alias: string): void {
   if (emailInput) {
     emailInput.value = alias;
     // Dispatch events to ensure frameworks like React or Vue detect the change.
-    emailInput.dispatchEvent(new Event('input', { bubbles: true }));
-    emailInput.dispatchEvent(new Event('change', { bubbles: true }));
+    emailInput.dispatchEvent(new Event("input", { bubbles: true }));
+    emailInput.dispatchEvent(new Event("change", { bubbles: true }));
     emailInput.focus();
   }
 }
@@ -280,7 +280,7 @@ function getEmailFieldDescription(): string | null {
   if (id) return `${id} field`;
   if (name) return `${name} field`;
 
-  return 'email field';
+  return "email field";
 }
 
 /**
@@ -288,7 +288,7 @@ function getEmailFieldDescription(): string | null {
  */
 async function showAliasGenerationDialog(): Promise<void> {
   // Remove any existing dialog to prevent duplicates
-  const existingDialog = document.querySelector('.alias-dialog');
+  const existingDialog = document.querySelector(".alias-dialog");
   if (existingDialog) {
     existingDialog.remove();
   }
@@ -296,17 +296,17 @@ async function showAliasGenerationDialog(): Promise<void> {
   try {
     // Fetch the HTML and CSS for the dialog from the extension's public resources.
     const [dialogHtml, dialogCss] = await Promise.all([
-      fetch(browser.runtime.getURL('dialog.html')).then((res) => res.text()),
-      fetch(browser.runtime.getURL('dialog.css')).then((res) => res.text()),
+      fetch(browser.runtime.getURL("dialog.html")).then((res) => res.text()),
+      fetch(browser.runtime.getURL("dialog.css")).then((res) => res.text()),
     ]);
 
     // Create a container for the dialog and inject the fetched HTML
-    const dialog = document.createElement('div');
-    dialog.className = 'alias-dialog';
+    const dialog = document.createElement("div");
+    dialog.className = "alias-dialog";
     dialog.innerHTML = dialogHtml;
 
     // Inject the fetched CSS into the document's head
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = dialogCss;
     document.head.appendChild(style);
     document.body.appendChild(dialog);
@@ -316,36 +316,36 @@ async function showAliasGenerationDialog(): Promise<void> {
     const autoLabel = await getDefaultLabel(); // Gets from storage or default
 
     // Get dialog elements
-    const labelInput = dialog.querySelector('#alias-label') as HTMLInputElement;
+    const labelInput = dialog.querySelector("#alias-label") as HTMLInputElement;
     const sourceInput = dialog.querySelector(
-      '#alias-source'
+      "#alias-source",
     ) as HTMLInputElement;
     const generateBtn = dialog.querySelector(
-      '#alias-generate-btn'
+      "#alias-generate-btn",
     ) as HTMLButtonElement;
     const cancelBtn = dialog.querySelector(
-      '#alias-cancel-btn'
+      "#alias-cancel-btn",
     ) as HTMLButtonElement;
     const closeBtn = dialog.querySelector(
-      '.alias-dialog-close'
+      ".alias-dialog-close",
     ) as HTMLButtonElement;
     const errorDiv = dialog.querySelector(
-      '#alias-dialog-error'
+      "#alias-dialog-error",
     ) as HTMLDivElement;
-    const labelHint = dialog.querySelector('#label-hint') as HTMLDivElement;
-    const sourceHint = dialog.querySelector('#source-hint') as HTMLDivElement;
+    const labelHint = dialog.querySelector("#label-hint") as HTMLDivElement;
+    const sourceHint = dialog.querySelector("#source-hint") as HTMLDivElement;
 
     // Add field preview if available
     const fieldDescription = getEmailFieldDescription();
     if (fieldDescription) {
-      const previewDiv = document.createElement('div');
-      previewDiv.className = 'field-preview';
+      const previewDiv = document.createElement("div");
+      previewDiv.className = "field-preview";
       previewDiv.innerHTML = `
         <div style="margin-bottom: 12px; padding: 8px 12px; background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 4px; font-size: 13px; color: #0369a1;">
           <strong>Will fill:</strong> ${fieldDescription}
         </div>
       `;
-      const form = dialog.querySelector('.alias-dialog-content form');
+      const form = dialog.querySelector(".alias-dialog-content form");
       if (form) {
         form.insertBefore(previewDiv, form.firstChild);
       }
@@ -369,18 +369,18 @@ async function showAliasGenerationDialog(): Promise<void> {
 
     const showError = (message: string) => {
       errorDiv.textContent = message;
-      errorDiv.classList.remove('hidden');
+      errorDiv.classList.remove("hidden");
     };
 
     const hideError = () => {
-      errorDiv.classList.add('hidden');
-      errorDiv.textContent = '';
+      errorDiv.classList.add("hidden");
+      errorDiv.textContent = "";
     };
 
     // Auto-fill hint interactions
     const setupHintInteraction = (
       input: HTMLInputElement,
-      hint: HTMLDivElement
+      hint: HTMLDivElement,
     ) => {
       if (!input || !hint) return;
 
@@ -388,25 +388,25 @@ async function showAliasGenerationDialog(): Promise<void> {
         // Show hint only when field contains the auto-filled default value
         // This tells the user "we auto-filled this, you can change it"
         if (input.value === input.defaultValue && input.defaultValue) {
-          hint.classList.remove('hidden');
+          hint.classList.remove("hidden");
         } else {
-          hint.classList.add('hidden');
+          hint.classList.add("hidden");
         }
       };
 
       // Hide hint immediately when user focuses (about to customize)
-      input.addEventListener('focus', () => {
-        hint.classList.add('hidden');
+      input.addEventListener("focus", () => {
+        hint.classList.add("hidden");
       });
 
       // Check if we should show hint again when user finishes editing
-      input.addEventListener('blur', updateHintVisibility);
+      input.addEventListener("blur", updateHintVisibility);
 
       // Hide hint in real-time as user types (immediate feedback)
-      input.addEventListener('input', updateHintVisibility);
+      input.addEventListener("input", updateHintVisibility);
 
       // Clicking hint focuses field and selects auto-filled value for easy replacement
-      hint.addEventListener('click', () => {
+      hint.addEventListener("click", () => {
         input.focus();
         input.select();
       });
@@ -419,28 +419,28 @@ async function showAliasGenerationDialog(): Promise<void> {
     setupHintInteraction(sourceInput, sourceHint);
 
     // Event listeners
-    closeBtn.addEventListener('click', closeDialog);
-    cancelBtn.addEventListener('click', closeDialog);
+    closeBtn.addEventListener("click", closeDialog);
+    cancelBtn.addEventListener("click", closeDialog);
 
-    dialog.addEventListener('click', (e) => {
+    dialog.addEventListener("click", (e) => {
       if (
-        (e.target as HTMLElement)?.classList.contains('alias-dialog-overlay')
+        (e.target as HTMLElement)?.classList.contains("alias-dialog-overlay")
       ) {
         closeDialog();
       }
     });
 
     const handleKeydown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         closeDialog();
-        document.removeEventListener('keydown', handleKeydown);
+        document.removeEventListener("keydown", handleKeydown);
       }
     };
-    document.addEventListener('keydown', handleKeydown);
+    document.addEventListener("keydown", handleKeydown);
 
     const showSuccessMessage = (message: string) => {
       // Create a temporary success message
-      const successDiv = document.createElement('div');
+      const successDiv = document.createElement("div");
       successDiv.textContent = message;
       successDiv.style.cssText = `
         position: fixed;
@@ -471,13 +471,13 @@ async function showAliasGenerationDialog(): Promise<void> {
       const source = sourceInput.value.trim();
 
       if (!label || !source) {
-        showError('Both Label and Source fields are required.');
+        showError("Both Label and Source fields are required.");
         return;
       }
 
       hideError();
       generateBtn.disabled = true;
-      generateBtn.textContent = 'Generating...';
+      generateBtn.textContent = "Generating...";
 
       try {
         const alias = await generateEmailAlias([label, source]);
@@ -494,9 +494,9 @@ async function showAliasGenerationDialog(): Promise<void> {
             showSuccessMessage(`Email alias copied to clipboard: ${alias}`);
             closeDialog();
           } catch (clipboardError) {
-            console.error('Failed to copy to clipboard:', clipboardError);
+            console.error("Failed to copy to clipboard:", clipboardError);
             showError(
-              `Generated alias: ${alias}\n(Could not copy to clipboard)`
+              `Generated alias: ${alias}\n(Could not copy to clipboard)`,
             );
           }
         }
@@ -504,20 +504,20 @@ async function showAliasGenerationDialog(): Promise<void> {
         if (error instanceof ApiError) {
           showError(error.message);
         } else {
-          console.error('An unexpected error occurred:', error);
-          showError('An unexpected error occurred. Please check the console.');
+          console.error("An unexpected error occurred:", error);
+          showError("An unexpected error occurred. Please check the console.");
         }
       } finally {
         generateBtn.disabled = false;
-        generateBtn.textContent = 'Generate Alias';
+        generateBtn.textContent = "Generate Alias";
       }
     };
 
-    generateBtn.addEventListener('click', () => void handleGenerate());
+    generateBtn.addEventListener("click", () => void handleGenerate());
 
     [labelInput, sourceInput].forEach((input) => {
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
           e.preventDefault();
           void handleGenerate();
         }
@@ -534,9 +534,9 @@ async function showAliasGenerationDialog(): Promise<void> {
       sourceInput.focus();
     }
   } catch (error) {
-    console.error('Failed to create or show alias generation dialog:', error);
+    console.error("Failed to create or show alias generation dialog:", error);
     alert(
-      'Error: Could not load the alias generation dialog. Check extension permissions and console for more details.'
+      "Error: Could not load the alias generation dialog. Check extension permissions and console for more details.",
     );
   }
 }

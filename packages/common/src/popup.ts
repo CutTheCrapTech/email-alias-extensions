@@ -1,29 +1,29 @@
-import { generateEmailAlias, ApiError } from './api';
-import { extractDomainForSource, getDefaultLabel } from './domain';
-import browser from 'webextension-polyfill';
+import browser from "webextension-polyfill";
+import { ApiError, generateEmailAlias } from "./api";
+import { extractDomainForSource, getDefaultLabel } from "./domain";
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // --- DOM Element Selection ---
   const labelInput = document.getElementById(
-    'label-input'
+    "label-input",
   ) as HTMLInputElement | null;
   const sourceInput = document.getElementById(
-    'source-input'
+    "source-input",
   ) as HTMLInputElement | null;
   const generateBtn = document.getElementById(
-    'generate-btn'
+    "generate-btn",
   ) as HTMLButtonElement | null;
   const resultContainer = document.getElementById(
-    'result-container'
+    "result-container",
   ) as HTMLDivElement | null;
   const aliasResultSpan = document.getElementById(
-    'alias-result'
+    "alias-result",
   ) as HTMLSpanElement | null;
   const copyBtn = document.getElementById(
-    'copy-btn'
+    "copy-btn",
   ) as HTMLButtonElement | null;
   const errorContainer = document.getElementById(
-    'error-container'
+    "error-container",
   ) as HTMLDivElement | null;
 
   // --- Type Guard ---
@@ -37,11 +37,11 @@ document.addEventListener('DOMContentLoaded', () => {
     !errorContainer
   ) {
     const message =
-      'A critical UI element is missing from popup.html and the extension cannot function.';
+      "A critical UI element is missing from popup.html and the extension cannot function.";
     console.error(message);
     if (errorContainer) {
       errorContainer.textContent = message;
-      errorContainer.classList.remove('hidden');
+      errorContainer.classList.remove("hidden");
     }
     return;
   }
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentWindow: true,
       });
 
-      let autoSource = '';
+      let autoSource = "";
       if (tab?.url) {
         autoSource = extractDomainForSource(tab.url);
       }
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         labelInput.focus();
       }
     } catch (error) {
-      console.error('Error during auto-fill initialization:', error);
+      console.error("Error during auto-fill initialization:", error);
       // Don't show this as an error to user, just log it
       // Still focus the first input
       labelInput.focus();
@@ -110,15 +110,15 @@ document.addEventListener('DOMContentLoaded', () => {
     errorContainer.innerHTML = showOptionsButton
       ? `${message} <button id="open-options-btn" style="margin-left: 8px;">Open Settings</button>`
       : message;
-    errorContainer.classList.remove('hidden');
-    resultContainer.classList.add('hidden');
+    errorContainer.classList.remove("hidden");
+    resultContainer.classList.add("hidden");
 
     // Add event listener for the options button if it was created
     if (showOptionsButton) {
-      const optionsBtn = document.getElementById('open-options-btn');
+      const optionsBtn = document.getElementById("open-options-btn");
       if (optionsBtn) {
-        optionsBtn.addEventListener('click', () => {
-          void browser.runtime.sendMessage({ action: 'openOptionsPage' });
+        optionsBtn.addEventListener("click", () => {
+          void browser.runtime.sendMessage({ action: "openOptionsPage" });
           window.close(); // Close the popup
         });
       }
@@ -129,9 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
    * Hides any currently displayed error message.
    */
   const hideError = () => {
-    if (!errorContainer.classList.contains('hidden')) {
-      errorContainer.classList.add('hidden');
-      errorContainer.innerHTML = '';
+    if (!errorContainer.classList.contains("hidden")) {
+      errorContainer.classList.add("hidden");
+      errorContainer.innerHTML = "";
     }
   };
 
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   const showResult = (alias: string) => {
     aliasResultSpan.textContent = alias;
-    resultContainer.classList.remove('hidden');
+    resultContainer.classList.remove("hidden");
     hideError();
   };
 
@@ -158,14 +158,14 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       if (tab?.id) {
         await browser.tabs.sendMessage(tab.id, {
-          action: 'fillEmailField',
+          action: "fillEmailField",
           alias: alias,
         });
       }
     } catch (error) {
       console.log(
-        'Could not auto-fill field (this is normal if no email field is focused):',
-        error
+        "Could not auto-fill field (this is normal if no email field is focused):",
+        error,
       );
       // Don't show this as an error to the user since it's expected behavior
     }
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const source = sourceInput.value.trim();
 
     if (!label || !source) {
-      showError('Both Label and Source fields are required.');
+      showError("Both Label and Source fields are required.");
       return;
     }
 
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     hideError();
     generateBtn.disabled = true;
-    generateBtn.textContent = 'Generating...';
+    generateBtn.textContent = "Generating...";
 
     try {
       const alias = await generateEmailAlias(aliasParts);
@@ -201,16 +201,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (error instanceof ApiError) {
         // Check if the error is about missing domain/token configuration
         const isConfigError = error.message.includes(
-          'Domain and Token are not configured'
+          "Domain and Token are not configured",
         );
         showError(error.message, isConfigError);
       } else {
-        console.error('An unexpected error occurred:', error);
-        showError('An unexpected error occurred. Please check the console.');
+        console.error("An unexpected error occurred:", error);
+        showError("An unexpected error occurred. Please check the console.");
       }
     } finally {
       generateBtn.disabled = false;
-      generateBtn.textContent = 'Generate';
+      generateBtn.textContent = "Generate";
     }
   };
 
@@ -223,13 +223,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       await navigator.clipboard.writeText(alias);
-      copyBtn.textContent = 'Copied!';
+      copyBtn.textContent = "Copied!";
       setTimeout(() => {
-        copyBtn.textContent = 'Copy';
+        copyBtn.textContent = "Copy";
       }, 1500);
     } catch (err) {
-      console.error('Failed to copy alias to clipboard: ', err);
-      showError('Could not copy alias to clipboard.');
+      console.error("Failed to copy alias to clipboard: ", err);
+      showError("Could not copy alias to clipboard.");
     }
   };
 
@@ -237,11 +237,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Use simple, non-async listeners that call the core async logic.
   // The `void` operator correctly handles the returned promise.
-  generateBtn.addEventListener('click', () => {
+  generateBtn.addEventListener("click", () => {
     void handleGeneration();
   });
 
-  copyBtn.addEventListener('click', () => {
+  copyBtn.addEventListener("click", () => {
     void handleCopy();
   });
 
@@ -250,14 +250,14 @@ document.addEventListener('DOMContentLoaded', () => {
    * @param event The keyboard event
    */
   const onEnterPress = (event: KeyboardEvent) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       event.preventDefault();
       void handleGeneration();
     }
   };
 
-  labelInput.addEventListener('keydown', onEnterPress);
-  sourceInput.addEventListener('keydown', onEnterPress);
+  labelInput.addEventListener("keydown", onEnterPress);
+  sourceInput.addEventListener("keydown", onEnterPress);
 
   // --- Initialize Auto-fill ---
   void initializeAutoFill();

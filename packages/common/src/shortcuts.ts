@@ -30,12 +30,12 @@ export class ShortcutRecorder {
     this.allRecordButtons.push(recordButton);
 
     // Set up event listeners
-    recordButton.addEventListener('click', () => {
+    recordButton.addEventListener("click", () => {
       this.startRecording(input, recordButton);
     });
 
-    clearButton.addEventListener('click', () => {
-      input.value = '';
+    clearButton.addEventListener("click", () => {
+      input.value = "";
       this.stopRecording();
     });
   }
@@ -48,17 +48,17 @@ export class ShortcutRecorder {
   private formatShortcut(event: KeyboardEvent): string {
     const parts: string[] = [];
 
-    if (event.ctrlKey) parts.push('Ctrl');
-    if (event.altKey) parts.push('Alt');
-    if (event.shiftKey) parts.push('Shift');
-    if (event.metaKey) parts.push('Meta');
+    if (event.ctrlKey) parts.push("Ctrl");
+    if (event.altKey) parts.push("Alt");
+    if (event.shiftKey) parts.push("Shift");
+    if (event.metaKey) parts.push("Meta");
 
     // Only add the key if it's not a modifier
-    if (!['Control', 'Alt', 'Shift', 'Meta'].includes(event.key)) {
+    if (!["Control", "Alt", "Shift", "Meta"].includes(event.key)) {
       parts.push(event.key.length === 1 ? event.key.toUpperCase() : event.key);
     }
 
-    return parts.join('+');
+    return parts.join("+");
   }
 
   /**
@@ -77,7 +77,7 @@ export class ShortcutRecorder {
     }
 
     const shortcut = this.formatShortcut(event);
-    if (shortcut && !shortcut.endsWith('+')) {
+    if (shortcut && !shortcut.endsWith("+")) {
       this.currentRecordingInput.value = shortcut;
       this.stopRecording();
     }
@@ -90,7 +90,7 @@ export class ShortcutRecorder {
    */
   private startRecording(
     inputElement: HTMLInputElement,
-    buttonElement: HTMLButtonElement
+    buttonElement: HTMLButtonElement,
   ): void {
     // Stop any existing recording
     if (this.isRecording) this.stopRecording();
@@ -100,13 +100,13 @@ export class ShortcutRecorder {
     this.currentRecordingButton = buttonElement;
 
     // Update UI state
-    inputElement.value = 'Press keys...';
-    inputElement.classList.add('recording');
-    buttonElement.textContent = 'Recording...';
+    inputElement.value = "Press keys...";
+    inputElement.classList.add("recording");
+    buttonElement.textContent = "Recording...";
     buttonElement.disabled = true;
 
     // Start listening for keyboard events
-    document.addEventListener('keydown', this.handleShortcutRecording, true);
+    document.addEventListener("keydown", this.handleShortcutRecording, true);
   }
 
   /**
@@ -116,19 +116,19 @@ export class ShortcutRecorder {
     if (!this.isRecording) return;
 
     this.isRecording = false;
-    document.removeEventListener('keydown', this.handleShortcutRecording, true);
+    document.removeEventListener("keydown", this.handleShortcutRecording, true);
 
     // Reset input state
     if (this.currentRecordingInput) {
-      this.currentRecordingInput.classList.remove('recording');
-      if (this.currentRecordingInput.value === 'Press keys...') {
-        this.currentRecordingInput.value = '';
+      this.currentRecordingInput.classList.remove("recording");
+      if (this.currentRecordingInput.value === "Press keys...") {
+        this.currentRecordingInput.value = "";
       }
     }
 
     // Reset all record buttons to their default state
     this.allRecordButtons.forEach((button) => {
-      button.textContent = 'Set Shortcut';
+      button.textContent = "Set Shortcut";
       button.disabled = false;
     });
 
@@ -142,20 +142,20 @@ export class ShortcutRecorder {
    */
   private setupGlobalEventListeners(): void {
     // Stop recording when clicking outside shortcut containers
-    document.addEventListener('click', (event) => {
+    document.addEventListener("click", (event) => {
       if (
         this.isRecording &&
         event.target &&
         event.target instanceof Element &&
-        !event.target.closest('.shortcut-input-container')
+        !event.target.closest(".shortcut-input-container")
       ) {
         this.stopRecording();
       }
     });
 
     // Stop recording on Escape key
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && this.isRecording) {
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && this.isRecording) {
         this.stopRecording();
       }
     });

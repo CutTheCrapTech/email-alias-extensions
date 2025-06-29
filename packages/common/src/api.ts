@@ -1,5 +1,5 @@
-import { generateEmailAlias as coreGenerateAlias } from 'email-alias-core';
-import { loadSettings } from './storage';
+import { generateEmailAlias as coreGenerateAlias } from "email-alias-core";
+import { loadSettings } from "./storage";
 
 /**
  * A custom error class to identify errors specific to the API module.
@@ -8,7 +8,7 @@ import { loadSettings } from './storage';
 export class ApiError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
   }
 }
 
@@ -28,16 +28,16 @@ export class ApiError extends Error {
  *                      or if the core library fails.
  */
 export async function generateEmailAlias(
-  aliasParts: string[]
+  aliasParts: string[],
 ): Promise<string> {
   // 1. Validate the input array and its contents
   if (!aliasParts || aliasParts.length !== 2) {
     throw new ApiError(
-      'Invalid input: exactly two parts (Label and Source) are required.'
+      "Invalid input: exactly two parts (Label and Source) are required.",
     );
   }
-  if (aliasParts.some((part) => !part || part.trim() === '')) {
-    throw new ApiError('Both Label and Source fields are required.');
+  if (aliasParts.some((part) => !part || part.trim() === "")) {
+    throw new ApiError("Both Label and Source fields are required.");
   }
 
   // 2. Load settings from storage
@@ -47,7 +47,7 @@ export async function generateEmailAlias(
   // 3. Validate that the settings are configured
   if (!domain || !token) {
     throw new ApiError(
-      'Domain and Token are not configured. Please go to the extension options to set them up.'
+      "Domain and Token are not configured. Please go to the extension options to set them up.",
     );
   }
 
@@ -62,11 +62,11 @@ export async function generateEmailAlias(
     return result;
   } catch (error: unknown) {
     // 5. Catch potential errors from the core library and re-throw as an ApiError
-    console.error('Error during alias generation from core library:', error);
+    console.error("Error during alias generation from core library:", error);
 
     // Safe error message extraction
     const errorMessage =
-      error instanceof Error ? error.message : 'An unknown error occurred.';
+      error instanceof Error ? error.message : "An unknown error occurred.";
 
     // Throw a new ApiError with the extracted message
     throw new ApiError(`Failed to generate alias: ${errorMessage}`);

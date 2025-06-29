@@ -1,25 +1,25 @@
 /**
  * @vitest-environment jsdom
  */
-import { vi, beforeEach, afterEach, describe, it, expect } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Must be first!
-vi.mock('webextension-polyfill', () => ({
+vi.mock("webextension-polyfill", () => ({
   default: {
     runtime: { onMessage: { addListener: vi.fn() } },
   },
 }));
 
-import { findAllEmailInputs, findBestEmailInput } from '../dialog';
+import { findAllEmailInputs, findBestEmailInput } from "../dialog";
 
 // Mock the isVisible function to return true in tests
-vi.mock('../dialog', async () => {
-  const actual = await vi.importActual('../dialog');
+vi.mock("../dialog", async () => {
+  const actual = await vi.importActual("../dialog");
   return {
     ...actual,
     // Override the module's internal isVisible function behavior
     findAllEmailInputs: () => {
-      const inputs = Array.from(document.querySelectorAll('input'));
+      const inputs = Array.from(document.querySelectorAll("input"));
       return inputs.filter((element: HTMLInputElement) => {
         if (!(element instanceof HTMLInputElement)) {
           return false;
@@ -32,7 +32,7 @@ vi.mock('../dialog', async () => {
 
         // Skip hidden attribute check in tests, but keep the style display check
         const style = window.getComputedStyle(element);
-        if (style.display === 'none') {
+        if (style.display === "none") {
           return false;
         }
 
@@ -41,34 +41,34 @@ vi.mock('../dialog', async () => {
         const name = element.name.toLowerCase();
         const placeholder = element.placeholder.toLowerCase();
         const autocomplete = (
-          element.getAttribute('autocomplete') || ''
+          element.getAttribute("autocomplete") || ""
         ).toLowerCase();
         const className = element.className.toLowerCase();
 
         // Primary check: type="email" is a strong indicator.
-        if (type === 'email') {
+        if (type === "email") {
           return true;
         }
 
         // Check autocomplete attribute, which is a modern standard.
-        if (autocomplete.includes('email') || autocomplete === 'username') {
+        if (autocomplete.includes("email") || autocomplete === "username") {
           return true;
         }
 
         // For type="text" or other types, check common naming conventions.
         const keywords = [
-          'email',
-          'e-mail',
-          'mail',
-          'login',
-          'user',
-          'username',
+          "email",
+          "e-mail",
+          "mail",
+          "login",
+          "user",
+          "username",
         ];
         const searchString = `${id} ${name} ${placeholder} ${className}`;
 
         if (keywords.some((keyword) => searchString.includes(keyword))) {
           // Avoid password fields that might contain 'user'
-          if (type === 'password') {
+          if (type === "password") {
             return false;
           }
           return true;
@@ -78,7 +78,7 @@ vi.mock('../dialog', async () => {
       });
     },
     findBestEmailInput: () => {
-      const emailInputs = Array.from(document.querySelectorAll('input')).filter(
+      const emailInputs = Array.from(document.querySelectorAll("input")).filter(
         (element: HTMLInputElement) => {
           if (!(element instanceof HTMLInputElement)) {
             return false;
@@ -91,7 +91,7 @@ vi.mock('../dialog', async () => {
 
           // Skip hidden attribute check in tests, but keep the style display check
           const style = window.getComputedStyle(element);
-          if (style.display === 'none') {
+          if (style.display === "none") {
             return false;
           }
 
@@ -100,41 +100,41 @@ vi.mock('../dialog', async () => {
           const name = element.name.toLowerCase();
           const placeholder = element.placeholder.toLowerCase();
           const autocomplete = (
-            element.getAttribute('autocomplete') || ''
+            element.getAttribute("autocomplete") || ""
           ).toLowerCase();
           const className = element.className.toLowerCase();
 
           // Primary check: type="email" is a strong indicator.
-          if (type === 'email') {
+          if (type === "email") {
             return true;
           }
 
           // Check autocomplete attribute, which is a modern standard.
-          if (autocomplete.includes('email') || autocomplete === 'username') {
+          if (autocomplete.includes("email") || autocomplete === "username") {
             return true;
           }
 
           // For type="text" or other types, check common naming conventions.
           const keywords = [
-            'email',
-            'e-mail',
-            'mail',
-            'login',
-            'user',
-            'username',
+            "email",
+            "e-mail",
+            "mail",
+            "login",
+            "user",
+            "username",
           ];
           const searchString = `${id} ${name} ${placeholder} ${className}`;
 
           if (keywords.some((keyword) => searchString.includes(keyword))) {
             // Avoid password fields that might contain 'user'
-            if (type === 'password') {
+            if (type === "password") {
               return false;
             }
             return true;
           }
 
           return false;
-        }
+        },
       );
 
       if (emailInputs.length === 0) return null;
@@ -149,7 +149,7 @@ vi.mock('../dialog', async () => {
         let score = 0;
 
         // Higher score for type="email"
-        if (input.type.toLowerCase() === 'email') {
+        if (input.type.toLowerCase() === "email") {
           score += 10;
         }
 
@@ -163,21 +163,21 @@ vi.mock('../dialog', async () => {
 
         // Higher score for inputs with email-specific autocomplete
         const autocomplete = (
-          input.getAttribute('autocomplete') || ''
+          input.getAttribute("autocomplete") || ""
         ).toLowerCase();
-        if (autocomplete.includes('email')) {
+        if (autocomplete.includes("email")) {
           score += 7;
         }
 
         // Higher score for inputs with specific names/ids
         const id = input.id.toLowerCase();
         const name = input.name.toLowerCase();
-        if (id.includes('email') || name.includes('email')) {
+        if (id.includes("email") || name.includes("email")) {
           score += 6;
         }
 
         // Prefer inputs that are in forms (more likely to be actual form fields)
-        if (input.closest('form')) {
+        if (input.closest("form")) {
           score += 3;
         }
 
@@ -195,17 +195,17 @@ vi.mock('../dialog', async () => {
   };
 });
 
-describe('Dialog Helpers', () => {
+describe("Dialog Helpers", () => {
   beforeEach(() => {
-    document.body.innerHTML = '';
+    document.body.innerHTML = "";
   });
 
   afterEach(() => {
-    document.body.innerHTML = '';
+    document.body.innerHTML = "";
   });
 
-  describe('findAllEmailInputs', () => {
-    it('should identify standard email inputs', async () => {
+  describe("findAllEmailInputs", () => {
+    it("should identify standard email inputs", async () => {
       document.body.innerHTML = `
         <input type="email">
         <input type="text" id="email">
@@ -216,7 +216,7 @@ describe('Dialog Helpers', () => {
       expect(inputs).toHaveLength(3);
     });
 
-    it('should ignore hidden and disabled inputs', async () => {
+    it("should ignore hidden and disabled inputs", async () => {
       document.body.innerHTML = `
         <input type="email">
         <input type="email" disabled>
@@ -228,7 +228,7 @@ describe('Dialog Helpers', () => {
       expect(inputs).toHaveLength(1);
     });
 
-    it('should handle inputs with email-related autocomplete', async () => {
+    it("should handle inputs with email-related autocomplete", async () => {
       document.body.innerHTML = `
         <input type="text" autocomplete="email">
         <input type="text" autocomplete="username">
@@ -239,40 +239,40 @@ describe('Dialog Helpers', () => {
     });
   });
 
-  describe('findBestEmailInput', () => {
-    it('should prioritize focused email fields', async () => {
+  describe("findBestEmailInput", () => {
+    it("should prioritize focused email fields", async () => {
       document.body.innerHTML = `
         <input type="email" id="email1">
         <input type="email" id="email2">
       `;
       await new Promise((r) => setTimeout(r, 0));
-      const email2 = document.getElementById('email2') as HTMLInputElement;
+      const email2 = document.getElementById("email2") as HTMLInputElement;
       email2.focus();
       expect(findBestEmailInput()).toBe(email2);
     });
 
-    it('should prefer type=email over other types', async () => {
+    it("should prefer type=email over other types", async () => {
       document.body.innerHTML = `
         <input type="text" id="text-email" name="email">
         <input type="email" id="real-email">
       `;
       await new Promise((r) => setTimeout(r, 0));
-      expect(findBestEmailInput()?.id).toBe('real-email');
+      expect(findBestEmailInput()?.id).toBe("real-email");
     });
 
-    it('should return null when no inputs found', () => {
-      document.body.innerHTML = '';
+    it("should return null when no inputs found", () => {
+      document.body.innerHTML = "";
       expect(findBestEmailInput()).toBeNull();
     });
 
-    it('should score inputs with email-specific attributes higher', async () => {
+    it("should score inputs with email-specific attributes higher", async () => {
       document.body.innerHTML = `
         <input type="text" id="generic">
         <input type="text" id="email-like" name="user_email">
         <input type="email" id="proper-email" autocomplete="email">
       `;
       await new Promise((r) => setTimeout(r, 0));
-      expect(findBestEmailInput()?.id).toBe('proper-email');
+      expect(findBestEmailInput()?.id).toBe("proper-email");
     });
   });
 });

@@ -1,4 +1,4 @@
-import browser from 'webextension-polyfill';
+import browser from "webextension-polyfill";
 
 /**
  * Extracts a clean domain name from a URL to be used as the 'source'.
@@ -20,20 +20,20 @@ export function extractDomainForSource(url?: string): string {
     }
 
     // Remove common subdomains like 'www.'
-    const domain = hostname.replace(/^(www\.)/, '');
-    const parts = domain.split('.');
+    const domain = hostname.replace(/^(www\.)/, "");
+    const parts = domain.split(".");
 
     // For domains like "example.com" -> return "example"
     // For domains like "s3.amazonaws.com" -> return "amazonaws"
     // For domains like "subdomain.example.co.uk" -> return "example"
     if (parts.length >= 2) {
-      return parts[parts.length - 2] || '';
+      return parts[parts.length - 2] || "";
     }
 
-    return parts[0] || '';
+    return parts[0] || "";
   } catch (error) {
-    console.error('Error extracting domain for source:', error);
-    return '';
+    console.error("Error extracting domain for source:", error);
+    return "";
   }
 }
 
@@ -45,17 +45,17 @@ export function extractDomainForSource(url?: string): string {
 export async function getDefaultLabel(): Promise<string> {
   try {
     // Try to get from browser storage if available
-    if (typeof browser !== 'undefined' && browser.storage) {
-      const result = await browser.storage.sync.get(['defaultLabel']);
-      if (result.defaultLabel && typeof result.defaultLabel === 'string') {
+    if (typeof browser !== "undefined" && browser.storage) {
+      const result = await browser.storage.sync.get(["defaultLabel"]);
+      if (result.defaultLabel && typeof result.defaultLabel === "string") {
         return result.defaultLabel;
       }
     }
 
     // Fall back to default
-    return 'marketing';
+    return "marketing";
   } catch (error) {
-    console.error('Error getting default label:', error);
-    return 'marketing';
+    console.error("Error getting default label:", error);
+    return "marketing";
   }
 }

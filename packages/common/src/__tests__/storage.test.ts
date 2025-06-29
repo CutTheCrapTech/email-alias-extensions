@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { saveSettings, loadSettings, ExtensionSettings } from '../storage';
-import browser from 'webextension-polyfill';
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import browser from "webextension-polyfill";
+import { type ExtensionSettings, loadSettings, saveSettings } from "../storage";
 
 // --- Type definitions for our mocks ---
 
@@ -16,7 +16,7 @@ type MockBrowserStorageSync = typeof browser.storage.sync & {
 
 // --- Mocking the `webextension-polyfill` library ---
 // We mock the entire module to control the behavior of `browser.storage.sync`.
-vi.mock('webextension-polyfill', () => {
+vi.mock("webextension-polyfill", () => {
   // A simple in-memory store to simulate the browser's storage
   let memoryStore: MockStorageData = {};
 
@@ -45,7 +45,7 @@ vi.mock('webextension-polyfill', () => {
   };
 });
 
-describe('Storage Module', () => {
+describe("Storage Module", () => {
   // Before each test, clear the mock history and our in-memory store
   beforeEach(() => {
     vi.clearAllMocks();
@@ -53,11 +53,11 @@ describe('Storage Module', () => {
     (browser.storage.sync as MockBrowserStorageSync)._clear();
   });
 
-  describe('saveSettings', () => {
-    it('should call browser.storage.sync.set with the correct key and settings', async () => {
+  describe("saveSettings", () => {
+    it("should call browser.storage.sync.set with the correct key and settings", async () => {
       const settings: ExtensionSettings = {
-        domain: 'example.com',
-        token: 'secret-token',
+        domain: "example.com",
+        token: "secret-token",
       };
 
       await saveSettings(settings);
@@ -71,12 +71,12 @@ describe('Storage Module', () => {
     });
   });
 
-  describe('loadSettings', () => {
-    it('should return the saved settings when they exist', async () => {
+  describe("loadSettings", () => {
+    it("should return the saved settings when they exist", async () => {
       // First, manually "save" settings to our mock store
       const settings: ExtensionSettings = {
-        domain: 'test.com',
-        token: 'another-token',
+        domain: "test.com",
+        token: "another-token",
       };
       await browser.storage.sync.set({ extension_settings: settings });
 
@@ -85,41 +85,41 @@ describe('Storage Module', () => {
 
       // We expect `get` to have been called with the correct key
       expect(browser.storage.sync.get).toHaveBeenCalledWith(
-        'extension_settings'
+        "extension_settings",
       );
       // And we expect the loaded settings to match what we saved
       expect(loaded).toEqual(settings);
     });
 
-    it('should return an empty object when no settings are saved', async () => {
+    it("should return an empty object when no settings are saved", async () => {
       const loaded = await loadSettings();
       expect(browser.storage.sync.get).toHaveBeenCalledWith(
-        'extension_settings'
+        "extension_settings",
       );
       // The result should be an empty object, not null or undefined
       expect(loaded).toEqual({});
     });
 
-    it('should handle corrupted storage data', async () => {
+    it("should handle corrupted storage data", async () => {
       vi.mocked(browser.storage.sync.get).mockResolvedValue({
-        extension_settings: 'invalid', // Not an object
+        extension_settings: "invalid", // Not an object
       });
       const settings = await loadSettings();
-      expect(settings).toEqual('invalid');
+      expect(settings).toEqual("invalid");
     });
 
-    it('should preserve existing settings when saving partial updates', async () => {
+    it("should preserve existing settings when saving partial updates", async () => {
       // First save complete settings
-      await saveSettings({ domain: 'test.com', token: 'secret' });
+      await saveSettings({ domain: "test.com", token: "secret" });
       // Corrupt the storage
       vi.mocked(browser.storage.sync.get).mockResolvedValue({
-        extension_settings: 'invalid',
+        extension_settings: "invalid",
       });
       // Then update just one field
-      await saveSettings({ defaultLabel: 'work' });
+      await saveSettings({ defaultLabel: "work" });
       // Verify merge failed gracefully and returned 'invalid'
       const settings = await loadSettings();
-      expect(settings).toEqual('invalid');
+      expect(settings).toEqual("invalid");
     });
   });
 });

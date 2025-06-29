@@ -1,4 +1,4 @@
-import browser from 'webextension-polyfill';
+import browser from "webextension-polyfill";
 
 /**
  * Defines the structure for the settings object that will be stored.
@@ -14,7 +14,7 @@ export interface ExtensionSettings {
 }
 
 // A single key to store all settings under, to avoid cluttering the storage area.
-const SETTINGS_KEY = 'extension_settings';
+const SETTINGS_KEY = "extension_settings";
 
 /**
  * Saves the provided settings to `browser.storage.sync`.
@@ -28,8 +28,8 @@ export async function saveSettings(settings: ExtensionSettings): Promise<void> {
   try {
     await browser.storage.sync.set({ [SETTINGS_KEY]: settings });
   } catch (error) {
-    console.error('Failed to save settings:', error);
-    throw new Error('Could not save settings to browser storage.');
+    console.error("Failed to save settings:", error);
+    throw new Error("Could not save settings to browser storage.");
   }
 }
 
@@ -48,7 +48,7 @@ export async function loadSettings(): Promise<ExtensionSettings> {
     // and return it, or an empty object if it's not found.
     return (storageResult[SETTINGS_KEY] as ExtensionSettings) || {};
   } catch (error) {
-    console.error('Failed to load settings:', error);
-    throw new Error('Could not load settings from browser storage.');
+    console.error("Failed to load settings:", error);
+    throw new Error("Could not load settings from browser storage.");
   }
 }

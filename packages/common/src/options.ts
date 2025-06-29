@@ -1,5 +1,5 @@
-import { loadSettings, saveSettings } from './storage';
-import { ShortcutRecorder } from './shortcuts';
+import { ShortcutRecorder } from "./shortcuts";
+import { loadSettings, saveSettings } from "./storage";
 
 /**
  * A helper function to display a status message to the user.
@@ -9,16 +9,16 @@ import { ShortcutRecorder } from './shortcuts';
  * @param isError - If true, styles the message as an error. Defaults to false.
  */
 function showStatusMessage(message: string, isError = false): void {
-  const statusElement = document.getElementById('status-message');
+  const statusElement = document.getElementById("status-message");
   if (!statusElement) return;
 
   statusElement.textContent = message;
-  statusElement.classList.toggle('error', isError);
-  statusElement.classList.toggle('success', !isError);
-  statusElement.classList.remove('hidden');
+  statusElement.classList.toggle("error", isError);
+  statusElement.classList.toggle("success", !isError);
+  statusElement.classList.remove("hidden");
 
   setTimeout(() => {
-    statusElement.classList.add('hidden');
+    statusElement.classList.add("hidden");
   }, 3000);
 }
 
@@ -32,59 +32,59 @@ function generateSecureRandomString(length: number): string {
   crypto.getRandomValues(array);
   // Convert bytes to a URL-safe base64 string and remove padding
   return btoa(String.fromCharCode.apply(null, Array.from(array)))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
 }
 
 /**
  * Main execution block that runs when the options page is fully loaded.
  */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // --- Get references to DOM elements ---
-  const domainInput = document.getElementById('domain') as HTMLInputElement;
-  const tokenInput = document.getElementById('token') as HTMLInputElement;
+  const domainInput = document.getElementById("domain") as HTMLInputElement;
+  const tokenInput = document.getElementById("token") as HTMLInputElement;
   const defaultLabelInput = document.getElementById(
-    'default-label'
+    "default-label",
   ) as HTMLInputElement;
-  const saveButton = document.getElementById('save-btn') as HTMLButtonElement;
+  const saveButton = document.getElementById("save-btn") as HTMLButtonElement;
 
   // New Secret Key elements
   const generateKeyBtn = document.getElementById(
-    'generate-key-btn'
+    "generate-key-btn",
   ) as HTMLButtonElement;
-  const keyActions = document.getElementById('key-actions') as HTMLDivElement;
+  const keyActions = document.getElementById("key-actions") as HTMLDivElement;
   const copyKeyBtn = document.getElementById(
-    'copy-key-btn'
+    "copy-key-btn",
   ) as HTMLButtonElement;
   const saveBitwardenBtn = document.getElementById(
-    'save-bitwarden-btn'
+    "save-bitwarden-btn",
   ) as HTMLButtonElement;
   const save1PasswordBtn = document.getElementById(
-    'save-1password-btn'
+    "save-1password-btn",
   ) as HTMLButtonElement;
   const backupConfirmedCheckbox = document.getElementById(
-    'backup-confirmed'
+    "backup-confirmed",
   ) as HTMLInputElement;
 
   // Keyboard shortcut elements
   const popupShortcutInput = document.getElementById(
-    'popup-shortcut'
+    "popup-shortcut",
   ) as HTMLInputElement;
   const fillShortcutInput = document.getElementById(
-    'fill-shortcut'
+    "fill-shortcut",
   ) as HTMLInputElement;
   const recordPopupBtn = document.getElementById(
-    'record-popup-shortcut'
+    "record-popup-shortcut",
   ) as HTMLButtonElement;
   const recordFillBtn = document.getElementById(
-    'record-fill-shortcut'
+    "record-fill-shortcut",
   ) as HTMLButtonElement;
   const clearPopupBtn = document.getElementById(
-    'clear-popup-shortcut'
+    "clear-popup-shortcut",
   ) as HTMLButtonElement;
   const clearFillBtn = document.getElementById(
-    'clear-fill-shortcut'
+    "clear-fill-shortcut",
   ) as HTMLButtonElement;
 
   // Type guard to ensure all elements were found
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     !clearFillBtn
   ) {
     console.error(
-      'Could not find one or more required elements on the options page.'
+      "Could not find one or more required elements on the options page.",
     );
     return;
   }
@@ -130,39 +130,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Event Handlers ---
 
-  generateKeyBtn.addEventListener('click', () => {
+  generateKeyBtn.addEventListener("click", () => {
     const newKey = generateSecureRandomString(32);
     tokenInput.value = newKey;
-    tokenInput.type = 'text'; // Show the key
-    keyActions.classList.remove('hidden');
+    tokenInput.type = "text"; // Show the key
+    keyActions.classList.remove("hidden");
     backupConfirmedCheckbox.checked = false;
     saveButton.disabled = true;
     isNewKeyGenerated = true;
-    showStatusMessage('New key generated. Please back it up now.', false);
+    showStatusMessage("New key generated. Please back it up now.", false);
   });
 
-  copyKeyBtn.addEventListener('click', () => {
+  copyKeyBtn.addEventListener("click", () => {
     navigator.clipboard
       .writeText(tokenInput.value)
       .then(() => {
-        showStatusMessage('Key copied to clipboard!', false);
+        showStatusMessage("Key copied to clipboard!", false);
       })
       .catch(() => {
-        showStatusMessage('Failed to copy key.', true);
+        showStatusMessage("Failed to copy key.", true);
       });
   });
 
-  saveBitwardenBtn.addEventListener('click', () => {
+  saveBitwardenBtn.addEventListener("click", () => {
     void navigator.clipboard.writeText(tokenInput.value);
-    window.open('https://vault.bitwarden.com/#/add', '_blank');
+    window.open("https://vault.bitwarden.com/#/add", "_blank");
   });
 
-  save1PasswordBtn.addEventListener('click', () => {
+  save1PasswordBtn.addEventListener("click", () => {
     void navigator.clipboard.writeText(tokenInput.value);
-    window.open('https://my.1password.com/vaults/all/new', '_blank');
+    window.open("https://my.1password.com/vaults/all/new", "_blank");
   });
 
-  backupConfirmedCheckbox.addEventListener('change', () => {
+  backupConfirmedCheckbox.addEventListener("change", () => {
     saveButton.disabled = !backupConfirmedCheckbox.checked;
   });
 
@@ -171,14 +171,14 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadAndDisplaySettings(): Promise<void> {
     try {
       const settings = await loadSettings();
-      domainInput.value = settings.domain || '';
-      tokenInput.value = settings.token || '';
-      defaultLabelInput.value = settings.defaultLabel || 'marketing';
+      domainInput.value = settings.domain || "";
+      tokenInput.value = settings.token || "";
+      defaultLabelInput.value = settings.defaultLabel || "marketing";
 
       if (settings.keyboardShortcuts) {
-        popupShortcutInput.value = settings.keyboardShortcuts.openPopup || '';
+        popupShortcutInput.value = settings.keyboardShortcuts.openPopup || "";
         fillShortcutInput.value =
-          settings.keyboardShortcuts.fillCurrentField || '';
+          settings.keyboardShortcuts.fillCurrentField || "";
       }
 
       // If a token already exists, the save button should be enabled.
@@ -186,26 +186,26 @@ document.addEventListener('DOMContentLoaded', () => {
       saveButton.disabled = !settings.token;
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'An unknown error occurred.';
+        error instanceof Error ? error.message : "An unknown error occurred.";
       showStatusMessage(`Error loading settings: ${message}`, true);
     }
   }
 
-  saveButton.addEventListener('click', () => {
+  saveButton.addEventListener("click", () => {
     void (async () => {
       const domain = domainInput.value.trim();
       const token = tokenInput.value.trim();
-      const defaultLabel = defaultLabelInput.value.trim() || 'marketing';
+      const defaultLabel = defaultLabelInput.value.trim() || "marketing";
 
       if (!domain || !token) {
-        showStatusMessage('Domain and Secret Key fields are required.', true);
+        showStatusMessage("Domain and Secret Key fields are required.", true);
         return;
       }
 
       if (isNewKeyGenerated && !backupConfirmedCheckbox.checked) {
         showStatusMessage(
-          'Please confirm you have backed up the new secret key.',
-          true
+          "Please confirm you have backed up the new secret key.",
+          true,
         );
         return;
       }
@@ -223,14 +223,14 @@ document.addEventListener('DOMContentLoaded', () => {
           keyboardShortcuts,
         });
 
-        showStatusMessage('Settings saved successfully!');
+        showStatusMessage("Settings saved successfully!");
         // After saving, reset the state
         isNewKeyGenerated = false;
-        keyActions.classList.add('hidden');
-        tokenInput.type = 'password';
+        keyActions.classList.add("hidden");
+        tokenInput.type = "password";
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : 'An unknown error occurred.';
+          error instanceof Error ? error.message : "An unknown error occurred.";
         showStatusMessage(`Error saving settings: ${message}`, true);
       }
     })();
