@@ -24,20 +24,47 @@
         <input type="text" id="domain" placeholder="your-domain.com" />
       </div>
 
-      <div class="form-group">
+      <div class="form-group secret-key-group">
         <label for="token">
-          Secret Token
+          Secret Key
           <span
             class="info-icon"
-            title="The secret key used to generate unique, secure aliases. Keep this safe!"
+            title="The secret key used to generate unique, secure aliases. This key is the foundation of your email security."
             >i</span
           >
         </label>
-        <input
-          type="password"
-          id="token"
-          placeholder="Enter your secret token"
-        />
+        <div class="secret-key-container">
+          <input
+            type="password"
+            id="token"
+            placeholder="Generate a key to get started"
+            readonly
+          />
+          <button id="generate-key-btn" class="small-btn">
+            Generate New Key
+          </button>
+        </div>
+        <div id="key-actions" class="hidden">
+          <p class="backup-prompt">
+            <strong>Action Required:</strong> Back up this key in a password
+            manager. It is not recoverable.
+          </p>
+          <div class="button-group">
+            <button id="copy-key-btn" class="small-btn">Copy Key</button>
+            <button id="save-bitwarden-btn" class="small-btn">
+              Save to Bitwarden
+            </button>
+            <button id="save-1password-btn" class="small-btn">
+              Save to 1Password
+            </button>
+          </div>
+          <div class="backup-confirmation">
+            <input type="checkbox" id="backup-confirmed" />
+            <label for="backup-confirmed">
+              I have securely backed up my secret key.
+            </label>
+          </div>
+        </div>
       </div>
 
       <div class="form-group">

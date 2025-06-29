@@ -3,11 +3,14 @@
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    ["@semantic-release/github", {
-      "assets": [
-        { "path": "dist/chrome-extension.zip", "label": "Chrome Extension" },
-        { "path": "dist/firefox-extension.zip", "label": "Firefox Extension" }
-      ]
-    }]
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          { "path": "dist/chrome-extension.zip", "label": "Chrome Extension" },
+          { "path": "dist/firefox-extension.zip", "label": "Firefox Extension" }
+        ]
+      }
+    ]
   ]
 }
