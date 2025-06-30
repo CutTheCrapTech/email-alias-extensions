@@ -22,6 +22,24 @@
     "check:ci": "npm run type-check:all && npm run lint:ci && npm run test",
     "ci": "npm run check:ci && npm run build"
   },
+  "_scripts_documentation": {
+    "build": "Builds the browser extensions for all supported browsers.",
+    "build:chrome": "Builds the Chrome extension.",
+    "build:firefox": "Builds the Firefox extension.",
+    "type-check": "Performs a type check on the main source code.",
+    "type-check:test": "Performs a type check on the test files.",
+    "type-check:all": "Performs type checks on both main source code and test files.",
+    "format": "Formats the code using Biome.",
+    "lint": "Lints the code using Biome.",
+    "lint:fix": "Lints and automatically fixes fixable issues using Biome.",
+    "lint:unsafe_fix": "Lints and automatically fixes fixable and potentially unsafe issues using Biome.",
+    "lint:ci": "Lints the code for CI environments.",
+    "test": "Runs all tests using Vitest.",
+    "test:watch": "Runs tests in watch mode using Vitest.",
+    "check": "Runs type checks, linting, and tests.",
+    "check:ci": "Runs type checks, linting, and tests for CI environments.",
+    "ci": "Runs all CI checks and builds the extensions."
+  },
   "workspaces": [
     "packages/*"
   ],

@@ -81,7 +81,6 @@ npm run watch
 ## Usage
 
 1.  **Configure Settings**:
-
     - Open the extension's **Options** page.
     - Enter your domain (e.g., `example.com`).
     - Click **"Generate New Key"**.
@@ -90,18 +89,15 @@ npm run watch
     - Click **Save**.
 
 2.  **Deploy to Cloudflare**:
-
     - Add the generated key as a new secret variable to your Cloudflare Worker's configuration (e.g., `SECRET_1`, `SECRET_2`).
     - Deploy your worker.
 
 3.  **Generate Aliases**:
-
     - Click the extension icon in the toolbar.
     - Enter a label (e.g., `shopping`) and source (e.g., `amazon.com`).
     - Click **Generate** and copy the alias.
 
 4.  **Context Menu**:
-
     - Right-click on any webpage to generate an alias for the current domain.
 
 5.  **Shortcuts**:
