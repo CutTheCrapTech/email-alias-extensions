@@ -2,7 +2,7 @@
 
 **A browser extension for Firefox & Chrome that generates secure, verifiable email aliases for your custom domain.**
 
-This project provides a browser extension that allows you to quickly generate unique email aliases on the fly. It is built on top of the [`email-alias-core`](https://github.com/karteekiitg/email-alias-core) library and is designed for users who own a custom domain with a catch-all email address configured.
+This project provides a browser extension that allows you to quickly generate unique email aliases on the fly. It is built on top of the [`email-alias-core`](https://github.com/CutTheCrapTech/email-alias-core) library and is designed for users who own a custom domain with a catch-all email address configured.
 
 ## Features
 
@@ -42,7 +42,7 @@ This extension uses a **"Key Ring Model"** to provide a balance of high security
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/karteekiitg/email-alias-extensions.git
+    git clone https://github.com/CutTheCrapTech/email-alias-extensions.git
     cd email-alias-extensions
     ```
 2.  Install dependencies:
