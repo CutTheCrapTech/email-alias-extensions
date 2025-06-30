@@ -20,7 +20,8 @@
     "test:watch": "vitest",
     "check": "npm run type-check:all && npm run lint && npm run test",
     "check:ci": "npm run type-check:all && npm run lint:ci && npm run test",
-    "ci": "npm run check:ci && npm run build"
+    "ci": "npm run check:ci && npm run build",
+    "upgrade": "npx npm-check-updates --workspaces -u && npm install"
   },
   "_scripts_documentation": {
     "build": "Builds the browser extensions for all supported browsers.",
@@ -38,7 +39,8 @@
     "test:watch": "Runs tests in watch mode using Vitest.",
     "check": "Runs type checks, linting, and tests.",
     "check:ci": "Runs type checks, linting, and tests for CI environments.",
-    "ci": "Runs all CI checks and builds the extensions."
+    "ci": "Runs all CI checks and builds the extensions.",
+    "upgrade": "Upgrades dependencies using npm-check-updates."
   },
   "workspaces": [
     "packages/*"
