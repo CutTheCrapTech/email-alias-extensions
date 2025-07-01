@@ -118,6 +118,9 @@ describe("API Module: generateEmailAlias", () => {
   describe("Core Library Error Handling", () => {
     it("should catch errors from email-alias-core and re-throw as an ApiError", async () => {
       // Arrange
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
       vi.mocked(loadSettings).mockResolvedValue(validSettings);
       const coreError = new Error("Invalid character in token");
       vi.mocked(coreGenerateAlias).mockRejectedValue(coreError);
@@ -126,9 +129,13 @@ describe("API Module: generateEmailAlias", () => {
       await expect(generateEmailAlias(["test", "case"])).rejects.toThrow(
         `Failed to generate alias: ${coreError.message}`,
       );
+      consoleSpy.mockRestore();
     });
 
     it("should handle special characters in alias parts", async () => {
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
       vi.mocked(loadSettings).mockResolvedValue({
         domain: "example.com",
         token: "secret",
@@ -136,9 +143,13 @@ describe("API Module: generateEmailAlias", () => {
       await expect(
         generateEmailAlias(["shopping!", "amazon$"]),
       ).rejects.toThrow("Failed to generate alias: Invalid character in token");
+      consoleSpy.mockRestore();
     });
 
     it("should handle very long alias parts", async () => {
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
       vi.mocked(loadSettings).mockResolvedValue({
         domain: "example.com",
         token: "secret",
@@ -147,9 +158,13 @@ describe("API Module: generateEmailAlias", () => {
       await expect(generateEmailAlias([longString, "service"])).rejects.toThrow(
         "Failed to generate alias: Invalid character in token",
       );
+      consoleSpy.mockRestore();
     });
 
     it("should reject invalid tokens", async () => {
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
       vi.mocked(loadSettings).mockResolvedValue({
         domain: "example.com",
         token: "short", // Too short
@@ -157,6 +172,7 @@ describe("API Module: generateEmailAlias", () => {
       await expect(generateEmailAlias(["test", "case"])).rejects.toThrow(
         "Failed to generate alias",
       );
+      consoleSpy.mockRestore();
     });
   });
 });

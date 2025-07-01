@@ -1,4 +1,5 @@
-import { ShortcutRecorder } from "./shortcuts";
+import { generateSecureRandomString } from "email-alias-core";
+import browser from "webextension-polyfill";
 import { loadSettings, saveSettings } from "./storage";
 
 /**
@@ -23,18 +24,39 @@ function showStatusMessage(message: string, isError = false): void {
 }
 
 /**
- * Generates a cryptographically secure, URL-safe random string.
- * @param length The desired length of the string.
- * @returns A random string.
+ * Displays the keyboard shortcuts for the extension.
  */
-function generateSecureRandomString(length: number): string {
-  const array = new Uint8Array(length);
-  crypto.getRandomValues(array);
-  // Convert bytes to a URL-safe base64 string and remove padding
-  return btoa(String.fromCharCode.apply(null, Array.from(array)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=/g, "");
+async function displayShortcuts(): Promise<void> {
+  try {
+    const commands = await browser.commands.getAll();
+    const shortcutsContainer = document.getElementById("shortcuts-container");
+
+    if (!shortcutsContainer) {
+      console.warn("Shortcuts container not found");
+      return;
+    }
+
+    if (commands.length === 0) {
+      shortcutsContainer.innerHTML = "<p>No keyboard shortcuts configured.</p>";
+      return;
+    }
+
+    const shortcutsList = commands
+      .map((command) => {
+        const shortcut = command.shortcut || "Not set";
+        const description = command.description || "No description";
+        return `<li><strong>${shortcut}</strong>: ${description}</li>`;
+      })
+      .join("");
+
+    shortcutsContainer.innerHTML = `
+      <h3>Keyboard Shortcuts</h3>
+      <ul>${shortcutsList}</ul>
+      <p><em>You can customize these shortcuts in your browser's extension settings.</em></p>
+    `;
+  } catch (error) {
+    console.error("Failed to load keyboard shortcuts:", error);
+  }
 }
 
 /**
@@ -57,35 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const copyKeyBtn = document.getElementById(
     "copy-key-btn",
   ) as HTMLButtonElement;
-  const saveBitwardenBtn = document.getElementById(
-    "save-bitwarden-btn",
-  ) as HTMLButtonElement;
-  const save1PasswordBtn = document.getElementById(
-    "save-1password-btn",
-  ) as HTMLButtonElement;
   const backupConfirmedCheckbox = document.getElementById(
     "backup-confirmed",
   ) as HTMLInputElement;
-
-  // Keyboard shortcut elements
-  const popupShortcutInput = document.getElementById(
-    "popup-shortcut",
-  ) as HTMLInputElement;
-  const fillShortcutInput = document.getElementById(
-    "fill-shortcut",
-  ) as HTMLInputElement;
-  const recordPopupBtn = document.getElementById(
-    "record-popup-shortcut",
-  ) as HTMLButtonElement;
-  const recordFillBtn = document.getElementById(
-    "record-fill-shortcut",
-  ) as HTMLButtonElement;
-  const clearPopupBtn = document.getElementById(
-    "clear-popup-shortcut",
-  ) as HTMLButtonElement;
-  const clearFillBtn = document.getElementById(
-    "clear-fill-shortcut",
-  ) as HTMLButtonElement;
 
   // Type guard to ensure all elements were found
   if (
@@ -96,15 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     !generateKeyBtn ||
     !keyActions ||
     !copyKeyBtn ||
-    !saveBitwardenBtn ||
-    !save1PasswordBtn ||
-    !backupConfirmedCheckbox ||
-    !popupShortcutInput ||
-    !fillShortcutInput ||
-    !recordPopupBtn ||
-    !recordFillBtn ||
-    !clearPopupBtn ||
-    !clearFillBtn
+    !backupConfirmedCheckbox
   ) {
     console.error(
       "Could not find one or more required elements on the options page.",
@@ -115,20 +103,34 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- State variable ---
   let isNewKeyGenerated = false;
 
-  // --- Initialize Shortcut Recorder ---
-  const shortcutRecorder = new ShortcutRecorder();
-  shortcutRecorder.registerShortcut({
-    input: popupShortcutInput,
-    recordButton: recordPopupBtn,
-    clearButton: clearPopupBtn,
-  });
-  shortcutRecorder.registerShortcut({
-    input: fillShortcutInput,
-    recordButton: recordFillBtn,
-    clearButton: clearFillBtn,
-  });
+  // --- Form Validation Function ---
+  function validateForm(): void {
+    const domain = domainInput.value.trim();
+    const token = tokenInput.value.trim();
+
+    // Check if required fields are filled
+    const hasRequiredFields = domain && token;
+
+    // Check if backup confirmation is needed and satisfied
+    const needsBackupConfirmation = isNewKeyGenerated;
+    const hasBackupConfirmation = backupConfirmedCheckbox.checked;
+
+    // Enable save button only if all conditions are met
+    const canSave =
+      hasRequiredFields && (!needsBackupConfirmation || hasBackupConfirmation);
+
+    saveButton.disabled = !canSave;
+  }
+
+  // Initialize save button as disabled
+  saveButton.disabled = true;
 
   // --- Event Handlers ---
+
+  // Add validation on input changes
+  domainInput.addEventListener("input", validateForm);
+  tokenInput.addEventListener("input", validateForm);
+  backupConfirmedCheckbox.addEventListener("change", validateForm);
 
   generateKeyBtn.addEventListener("click", () => {
     const newKey = generateSecureRandomString(32);
@@ -136,9 +138,9 @@ document.addEventListener("DOMContentLoaded", () => {
     tokenInput.type = "text"; // Show the key
     keyActions.classList.remove("hidden");
     backupConfirmedCheckbox.checked = false;
-    saveButton.disabled = true;
     isNewKeyGenerated = true;
     showStatusMessage("New key generated. Please back it up now.", false);
+    validateForm(); // Revalidate after generating key
   });
 
   copyKeyBtn.addEventListener("click", () => {
@@ -152,20 +154,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  saveBitwardenBtn.addEventListener("click", () => {
-    void navigator.clipboard.writeText(tokenInput.value);
-    window.open("https://vault.bitwarden.com/#/add", "_blank");
-  });
-
-  save1PasswordBtn.addEventListener("click", () => {
-    void navigator.clipboard.writeText(tokenInput.value);
-    window.open("https://my.1password.com/vaults/all/new", "_blank");
-  });
-
-  backupConfirmedCheckbox.addEventListener("change", () => {
-    saveButton.disabled = !backupConfirmedCheckbox.checked;
-  });
-
   // --- Main Logic ---
 
   async function loadAndDisplaySettings(): Promise<void> {
@@ -175,15 +163,11 @@ document.addEventListener("DOMContentLoaded", () => {
       tokenInput.value = settings.token || "";
       defaultLabelInput.value = settings.defaultLabel || "marketing";
 
-      if (settings.keyboardShortcuts) {
-        popupShortcutInput.value = settings.keyboardShortcuts.openPopup || "";
-        fillShortcutInput.value =
-          settings.keyboardShortcuts.fillCurrentField || "";
-      }
+      // Reset the new key generated state since we're loading existing settings
+      isNewKeyGenerated = false;
 
-      // If a token already exists, the save button should be enabled.
-      // Otherwise, the user must generate a key and confirm backup.
-      saveButton.disabled = !settings.token;
+      // Validate form after loading settings
+      validateForm();
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "An unknown error occurred.";
@@ -211,16 +195,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        const keyboardShortcuts = {
-          openPopup: popupShortcutInput.value.trim() || undefined,
-          fillCurrentField: fillShortcutInput.value.trim() || undefined,
-        };
-
         await saveSettings({
           domain,
           token,
           defaultLabel,
-          keyboardShortcuts,
         });
 
         showStatusMessage("Settings saved successfully!");
@@ -228,6 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
         isNewKeyGenerated = false;
         keyActions.classList.add("hidden");
         tokenInput.type = "password";
+        validateForm(); // Revalidate after saving
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "An unknown error occurred.";
@@ -238,4 +217,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Initial Load ---
   void loadAndDisplaySettings();
+  void displayShortcuts();
 });

@@ -3,5 +3,11 @@
   "compilerOptions": {
     "types": ["vitest/globals", "jsdom"]
   },
-  "include": ["packages/common/src/__tests__/**/*.ts"]
+  "include": [
+    "packages/**/*.test.ts",
+    "packages/**/*.spec.ts",
+    "packages/**/__tests__/**/*",
+    "*.ts"
+  ],
+  "exclude": []
 }

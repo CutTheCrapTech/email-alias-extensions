@@ -297,7 +297,7 @@ async function showAliasGenerationDialog(): Promise<void> {
     // Fetch the HTML and CSS for the dialog from the extension's public resources.
     const [dialogHtml, dialogCss] = await Promise.all([
       fetch(browser.runtime.getURL("dialog.html")).then((res) => res.text()),
-      fetch(browser.runtime.getURL("dialog.css")).then((res) => res.text()),
+      fetch(browser.runtime.getURL("css/dialog.css")).then((res) => res.text()),
     ]);
 
     // Create a container for the dialog and inject the fetched HTML

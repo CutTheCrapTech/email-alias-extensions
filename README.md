@@ -6,12 +6,15 @@ This project provides a browser extension that allows you to quickly generate un
 
 ## Features
 
-- **Secure Alias Generation**: Generate strong, unique email aliases directly in your browser.
+- **Secure Alias Generation**: Generate strong, unique email aliases directly in your browser using cryptographic algorithms.
 - **Resilient & Recoverable**: Uses the "Key Ring Model" so that losing a key is not a catastrophic event.
 - **Tracker-Free Emails**: Designed to work with services like [Cloudflare Workers](#integration-with-cloudflare-workers) to clean email trackers.
-- **Cross-Browser Support**: Works seamlessly on Chrome & Firefox.
-- **Guided Setup**: An easy-to-use options page helps you generate and back up your secret key.
-- **Context Menu & Shortcuts**: Quickly generate aliases from any webpage or with a keyboard shortcut.
+- **Cross-Browser Support**: Works seamlessly on Chrome & Firefox with manifest v3.
+- **Guided Setup**: An easy-to-use options page helps you generate and back up your secret key with secure random generation.
+- **Context Menu & Shortcuts**: Quickly generate aliases from any webpage or with customizable keyboard shortcuts.
+- **Toast Notifications**: Real-time feedback with success/error notifications for better user experience.
+- **Improved Error Handling**: Comprehensive error handling and user-friendly error messages.
+- **Enhanced UI**: Modern, responsive design with dark mode support and improved accessibility.
 
 ## Security and Recovery: The "Key Ring Model"
 
@@ -49,6 +52,10 @@ This extension uses a **"Key Ring Model"** to provide a balance of high security
     ```bash
     npm install
     ```
+3.  Run quality checks:
+    ```bash
+    npm run check
+    ```
 
 ### Build
 
@@ -58,10 +65,20 @@ To build the extensions for Chrome and Firefox:
 npm run build
 ```
 
-For development with live reloading:
+To build for a specific browser:
 
 ```bash
-npm run watch
+npm run build:chrome
+npm run build:firefox
+```
+
+For development, run all quality checks:
+
+```bash
+npm run format  # Format code
+npm run lint    # Check code quality
+npm run test    # Run tests
+npm run type-check  # TypeScript type checking
 ```
 
 ## Browser Installation
@@ -83,7 +100,7 @@ npm run watch
 1.  **Configure Settings**:
     - Open the extension's **Options** page.
     - Enter your domain (e.g., `example.com`).
-    - Click **"Generate New Key"**.
+    - Click **"Generate New Key"** to create a cryptographically secure secret key.
     - **CRITICAL:** Use the provided buttons to copy the key and save it immediately to a secure password manager (like Bitwarden or 1Password).
     - Check the box confirming you have backed up the key.
     - Click **Save**.
@@ -96,12 +113,22 @@ npm run watch
     - Click the extension icon in the toolbar.
     - Enter a label (e.g., `shopping`) and source (e.g., `amazon.com`).
     - Click **Generate** and copy the alias.
+    - Success notifications will confirm when aliases are generated and copied.
 
 4.  **Context Menu**:
     - Right-click on any webpage to generate an alias for the current domain.
+    - The dialog will auto-fill the source based on the current website.
 
-5.  **Shortcuts**:
-    - Use the keyboard shortcuts setup on the options page to directly generate email aliases.
+5.  **Keyboard Shortcuts**:
+    - **Open Dialog**: `Ctrl+Shift+E` - Opens the alias generator popup
+    - **Fill Current Field**: `Ctrl+Shift+U` - Generates and fills email input on the current page
+    - **Quick Generate**: `Ctrl+Shift+Y` - Generates an alias and copies it to clipboard
+    - Shortcuts can be customized in your browser's extension settings.
+
+6.  **Enhanced Features**:
+    - **Toast Notifications**: Get real-time feedback for successful operations and errors.
+    - **Auto-fill Detection**: The extension detects email fields and can auto-fill them.
+    - **Dark Mode**: Automatically adapts to your browser's theme preference.
 
 ## Integration with Cloudflare Workers
 
@@ -114,9 +141,72 @@ This extension pairs perfectly with a Cloudflare Workers setup to:
 
 **TODO**: Add link to Cloudflare Workers repo once available.
 
+## Development
+
+This project uses a modern TypeScript monorepo structure with comprehensive tooling:
+
+### Project Structure
+
+```
+email-alias-extensions/
+├── packages/
+│   ├── common/           # Shared code and assets
+│   │   ├── src/          # TypeScript source files
+│   │   │   ├── __tests__ # Test files
+│   │   │   └── *.ts      # Core modules
+│   │   └── public/       # Static assets
+│   │       ├── css/      # Modular CSS files
+│   │       └── *.html    # HTML templates
+│   ├── chrome/           # Chrome-specific files
+│   └── firefox/          # Firefox-specific files
+├── scripts/              # Build scripts
+└── docs/                 # Documentation
+```
+
+### CSS Architecture
+
+The CSS has been modularized for better maintainability:
+
+- `css/variables.css` - CSS custom properties and color themes
+- `css/base.css` - Typography and basic layout
+- `css/forms.css` - Form elements and inputs
+- `css/buttons.css` - Button styles and variants
+- `css/components.css` - Reusable UI components
+- `css/layout.css` - Grid, flexbox utilities, and responsive design
+- `css/popup.css` - Popup-specific styles
+- `css/shortcuts.css` - Keyboard shortcut related styles
+- `css/toast.css` - Toast notification system
+- `css/dialog.css` - Modal dialog styles
+
+### Quality Assurance
+
+- **TypeScript**: Full type safety across the codebase
+- **Testing**: Comprehensive test suite with Vitest
+- **Linting**: Code quality enforced with Biome
+- **Formatting**: Consistent code style with Biome formatter
+- **CI/CD**: Automated checks on all commits
+
+### Running Tests
+
+```bash
+npm test              # Run all tests
+npm run test:watch    # Run tests in watch mode
+npm run type-check    # TypeScript type checking
+npm run lint          # Code quality checks
+npm run format        # Code formatting
+```
+
 ## Contributing
 
 Pull requests are welcome! For major changes, please open an issue first to discuss the changes.
+
+### Before submitting:
+
+1. Ensure all tests pass: `npm test`
+2. Run type checking: `npm run type-check`
+3. Format code: `npm run format`
+4. Fix any linting issues: `npm run lint:fix`
+5. Test the build: `npm run build`
 
 ## License
 
