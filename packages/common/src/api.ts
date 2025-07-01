@@ -1,16 +1,8 @@
 import { generateEmailAlias as coreGenerateAlias } from "email-alias-core";
+import { ApiError } from "./errors";
 import { loadSettings } from "./storage";
 
-/**
- * A custom error class to identify errors specific to the API module.
- * This helps in providing targeted feedback to the user in the UI.
- */
-export class ApiError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "ApiError";
-  }
-}
+export { ApiError };
 
 /**
  * Generates an email alias by orchestrating settings retrieval and calling the core library.

@@ -56,7 +56,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["dialog.html", "dialog.css"],
+      "resources": ["dialog.html", "css/dialog.css", "css/*"],
       "matches": ["<all_urls>"]
     }
   ],

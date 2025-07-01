@@ -1,8 +1,7 @@
 import browser from "webextension-polyfill";
-import {
-  ApiError,
-  generateAliasForBackgroundWithUrl,
-} from "./background-alias-generator";
+import { generateAliasForBackgroundWithUrl } from "./background-alias-generator";
+import { ApiError } from "./errors";
+import { loadSettings } from "./storage";
 
 // Define message types
 interface OpenOptionsMessage {
@@ -14,8 +13,9 @@ interface ShowAliasDialogMessage {
   source?: "keyboard-shortcut" | "context-menu" | "popup";
 }
 
-interface FillCurrentFieldMessage {
-  type: "fill-current-field";
+interface FillEmailFieldMessage {
+  type: "fill-email-field";
+  alias: string;
   source?: "keyboard-shortcut";
 }
 
@@ -136,11 +136,7 @@ async function handleOpenDialogCommand(tabId: number): Promise<void> {
  */
 async function handleFillCurrentFieldCommand(tabId: number): Promise<void> {
   try {
-    const settings = await browser.storage.sync.get([
-      "domain",
-      "token",
-      "defaultLabel",
-    ]);
+    const settings = await loadSettings();
 
     if (!settings.domain || !settings.token) {
       await showNotification(
@@ -165,9 +161,9 @@ async function handleFillCurrentFieldCommand(tabId: number): Promise<void> {
     }
 
     await browser.tabs.sendMessage(tabId, {
-      type: "fill-current-field",
+      type: "fill-email-field",
       alias: alias,
-    } as FillCurrentFieldMessage);
+    } as FillEmailFieldMessage);
   } catch (error) {
     console.error("Failed to handle fill-current-field command:", error);
     const errorMessage =
@@ -185,11 +181,7 @@ async function handleFillCurrentFieldCommand(tabId: number): Promise<void> {
  */
 async function handleQuickGenerateCommand(tabId: number): Promise<void> {
   try {
-    const settings = await browser.storage.sync.get([
-      "domain",
-      "token",
-      "defaultLabel",
-    ]);
+    const settings = await loadSettings();
 
     if (!settings.domain || !settings.token) {
       await showNotification(
@@ -235,7 +227,7 @@ async function showNotification(
   isError = false,
 ): Promise<void> {
   try {
-    const iconUrl = isError ? "icons/icon-48.png" : "icons/icon-48.png";
+    const iconUrl = isError ? "icons/icon48.png" : "icons/icon48.png";
     const title = isError
       ? "Email Alias Generator - Error"
       : "Email Alias Generator";

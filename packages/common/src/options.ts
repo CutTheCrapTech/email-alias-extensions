@@ -29,7 +29,7 @@ function showStatusMessage(message: string, isError = false): void {
 async function displayShortcuts(): Promise<void> {
   try {
     const commands = await browser.commands.getAll();
-    const shortcutsContainer = document.getElementById("shortcuts-container");
+    const shortcutsContainer = document.getElementById("shortcut-list");
 
     if (!shortcutsContainer) {
       console.warn("Shortcuts container not found");

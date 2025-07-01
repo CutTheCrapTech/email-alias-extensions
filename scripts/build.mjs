@@ -25,10 +25,19 @@ const esbuildConfig = {
     path.join(commonDir, "src", "popup.ts"),
     path.join(commonDir, "src", "options.ts"),
     path.join(commonDir, "src", "background.ts"),
-    path.join(commonDir, "src", "dialog.ts"),
   ],
   bundle: true,
   format: "esm", // Use ES modules for modern extensions
+  target: "es2020",
+  loader: { ".ts": "ts" },
+  // The 'outdir' will be specified dynamically for each browser build
+};
+
+// Separate configuration for content scripts (no exports)
+const contentScriptConfig = {
+  entryPoints: [path.join(commonDir, "src", "dialog.ts")],
+  bundle: true,
+  format: "iife", // Use IIFE for content scripts to avoid export issues
   target: "es2020",
   loader: { ".ts": "ts" },
   // The 'outdir' will be specified dynamically for each browser build
@@ -68,6 +77,12 @@ async function buildExtension(buildConfig) {
     // 4. Bundle TypeScript files into JavaScript using esbuild.
     await esbuild.build({
       ...esbuildConfig,
+      outdir: extensionOutDir, // Set the output directory for the bundled JS
+    });
+
+    // 5. Bundle content scripts separately with IIFE format
+    await esbuild.build({
+      ...contentScriptConfig,
       outdir: extensionOutDir, // Set the output directory for the bundled JS
     });
     console.log(`[${name}] Successfully bundled TypeScript scripts.`);

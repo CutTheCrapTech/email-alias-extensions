@@ -1,4 +1,5 @@
 import browser from "webextension-polyfill";
+import { loadSettings } from "./storage";
 
 /**
  * Extracts a clean domain name from a URL to be used as the 'source'.
@@ -46,9 +47,9 @@ export async function getDefaultLabel(): Promise<string> {
   try {
     // Try to get from browser storage if available
     if (typeof browser !== "undefined" && browser.storage) {
-      const result = await browser.storage.sync.get(["defaultLabel"]);
-      if (result.defaultLabel && typeof result.defaultLabel === "string") {
-        return result.defaultLabel;
+      const settings = await loadSettings();
+      if (settings.defaultLabel && typeof settings.defaultLabel === "string") {
+        return settings.defaultLabel;
       }
     }
 

@@ -1,34 +1,6 @@
 import { generateEmailAlias } from "./api";
-
-/**
- * A custom error class to identify errors specific to the API module.
- * This helps in providing targeted feedback to the user in the UI.
- */
-export class ApiError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "ApiError";
-  }
-}
-
-/**
- * Gets the default label for alias generation.
- * @returns The default label string
- */
-export async function getDefaultLabel(): Promise<string> {
-  return "marketing";
-}
-
-/**
- * Extracts domain name from the current active tab URL for use as source.
- * @returns The domain name or a default value
- */
-export function extractDomainForSource(): string {
-  // Since we're in a service worker context, we can't directly access the current tab
-  // This function should be called with the tab URL passed as parameter
-  // For now, return a default value
-  return "website";
-}
+import { extractDomainForSource, getDefaultLabel } from "./domain";
+import { ApiError } from "./errors";
 
 /**
  * Generates an email alias for use in background scripts.
@@ -59,21 +31,7 @@ export async function generateAliasForBackgroundWithUrl(
 ): Promise<string> {
   try {
     const defaultLabel = await getDefaultLabel();
-    let domain = "website";
-
-    if (tabUrl) {
-      try {
-        const url = new URL(tabUrl);
-        // Handle file:// URLs and other protocols without hostnames
-        if (url.hostname) {
-          domain = url.hostname.replace(/^www\./, "");
-        } else {
-          domain = "website";
-        }
-      } catch {
-        domain = "website";
-      }
-    }
+    const domain = extractDomainForSource(tabUrl);
 
     return await generateEmailAlias([defaultLabel, domain]);
   } catch (error) {

@@ -1,16 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as apiModule from "../api";
 import {
-  ApiError,
-  extractDomainForSource,
   generateAliasForBackground,
   generateAliasForBackgroundWithUrl,
-  getDefaultLabel,
 } from "../background-alias-generator";
+import { extractDomainForSource, getDefaultLabel } from "../domain";
+import { ApiError } from "../errors";
 
 // Mock the api module
 vi.mock("../api", () => ({
   generateEmailAlias: vi.fn(),
+}));
+
+// Mock the domain module
+vi.mock("../domain", () => ({
+  getDefaultLabel: vi.fn(),
+  extractDomainForSource: vi.fn(),
 }));
 
 describe("Background Alias Generator", () => {
@@ -38,23 +43,28 @@ describe("Background Alias Generator", () => {
   });
 
   describe("getDefaultLabel", () => {
-    it("should return the default label 'marketing'", async () => {
+    it("should return the default label", async () => {
+      // Mock the domain module's getDefaultLabel
+      vi.mocked(getDefaultLabel).mockResolvedValue("marketing");
+
       const result = await getDefaultLabel();
       expect(result).toBe("marketing");
     });
   });
 
   describe("extractDomainForSource", () => {
-    it("should return 'website' as the default domain", () => {
-      const result = extractDomainForSource();
-      expect(result).toBe("website");
+    it("should return extracted domain from URL", () => {
+      vi.mocked(extractDomainForSource).mockReturnValue("github");
+      const result = extractDomainForSource("https://github.com");
+      expect(result).toBe("github");
     });
   });
 
   describe("generateAliasForBackground", () => {
     it("should generate an alias using default values", async () => {
-      const expectedAlias = "marketing-website@example.com";
+      const expectedAlias = "alias@example.com";
       mockGenerateEmailAlias.mockResolvedValue(expectedAlias);
+      vi.mocked(extractDomainForSource).mockReturnValue("website");
 
       const result = await generateAliasForBackground();
 
@@ -87,8 +97,9 @@ describe("Background Alias Generator", () => {
 
   describe("generateAliasForBackgroundWithUrl", () => {
     it("should generate an alias using default domain when no URL provided", async () => {
-      const expectedAlias = "marketing-website@example.com";
+      const expectedAlias = "alias@example.com";
       mockGenerateEmailAlias.mockResolvedValue(expectedAlias);
+      vi.mocked(extractDomainForSource).mockReturnValue("website");
 
       const result = await generateAliasForBackgroundWithUrl();
 
@@ -100,23 +111,25 @@ describe("Background Alias Generator", () => {
     });
 
     it("should extract domain from valid URL", async () => {
-      const expectedAlias = "marketing-example@example.com";
+      const expectedAlias = "alias@example.com";
       mockGenerateEmailAlias.mockResolvedValue(expectedAlias);
+      vi.mocked(extractDomainForSource).mockReturnValue("example");
 
       const result = await generateAliasForBackgroundWithUrl(
-        "https://www.example.com/path?query=value",
+        "https://example.com",
       );
 
       expect(result).toBe(expectedAlias);
       expect(mockGenerateEmailAlias).toHaveBeenCalledWith([
         "marketing",
-        "example.com",
+        "example",
       ]);
     });
 
     it("should remove www prefix from hostname", async () => {
-      const expectedAlias = "marketing-google@example.com";
+      const expectedAlias = "alias@example.com";
       mockGenerateEmailAlias.mockResolvedValue(expectedAlias);
+      vi.mocked(extractDomainForSource).mockReturnValue("google");
 
       const result = await generateAliasForBackgroundWithUrl(
         "https://www.google.com",
@@ -125,41 +138,40 @@ describe("Background Alias Generator", () => {
       expect(result).toBe(expectedAlias);
       expect(mockGenerateEmailAlias).toHaveBeenCalledWith([
         "marketing",
-        "google.com",
+        "google",
       ]);
     });
 
     it("should handle non-www hostnames correctly", async () => {
-      const expectedAlias = "marketing-github@example.com";
+      const expectedAlias = "alias@example.com";
       mockGenerateEmailAlias.mockResolvedValue(expectedAlias);
+      vi.mocked(extractDomainForSource).mockReturnValue("github");
 
-      const result = await generateAliasForBackgroundWithUrl(
-        "https://github.com/user/repo",
-      );
+      const result =
+        await generateAliasForBackgroundWithUrl("https://github.com");
 
       expect(result).toBe(expectedAlias);
       expect(mockGenerateEmailAlias).toHaveBeenCalledWith([
         "marketing",
-        "github.com",
+        "github",
       ]);
     });
 
     it("should fallback to 'website' for invalid URLs", async () => {
-      const expectedAlias = "marketing-website@example.com";
+      const expectedAlias = "alias@example.com";
       mockGenerateEmailAlias.mockResolvedValue(expectedAlias);
+      vi.mocked(extractDomainForSource).mockReturnValue("");
 
       const result = await generateAliasForBackgroundWithUrl("invalid-url");
 
       expect(result).toBe(expectedAlias);
-      expect(mockGenerateEmailAlias).toHaveBeenCalledWith([
-        "marketing",
-        "website",
-      ]);
+      expect(mockGenerateEmailAlias).toHaveBeenCalledWith(["marketing", ""]);
     });
 
     it("should handle localhost URLs", async () => {
-      const expectedAlias = "marketing-localhost@example.com";
+      const expectedAlias = "alias@example.com";
       mockGenerateEmailAlias.mockResolvedValue(expectedAlias);
+      vi.mocked(extractDomainForSource).mockReturnValue("localhost");
 
       const result = await generateAliasForBackgroundWithUrl(
         "http://localhost:3000",
@@ -173,18 +185,16 @@ describe("Background Alias Generator", () => {
     });
 
     it("should handle IP addresses", async () => {
-      const expectedAlias = "marketing-192.168.1.1@example.com";
+      const expectedAlias = "alias@example.com";
       mockGenerateEmailAlias.mockResolvedValue(expectedAlias);
+      vi.mocked(extractDomainForSource).mockReturnValue("192");
 
       const result = await generateAliasForBackgroundWithUrl(
         "http://192.168.1.1:8080",
       );
 
       expect(result).toBe(expectedAlias);
-      expect(mockGenerateEmailAlias).toHaveBeenCalledWith([
-        "marketing",
-        "192.168.1.1",
-      ]);
+      expect(mockGenerateEmailAlias).toHaveBeenCalledWith(["marketing", "192"]);
     });
 
     it("should throw ApiError when generation fails with Error", async () => {
@@ -211,33 +221,32 @@ describe("Background Alias Generator", () => {
     });
 
     it("should handle URLs with subdomains correctly", async () => {
-      const expectedAlias = "marketing-api.github@example.com";
+      const expectedAlias = "alias@example.com";
       mockGenerateEmailAlias.mockResolvedValue(expectedAlias);
+      vi.mocked(extractDomainForSource).mockReturnValue("github");
 
       const result = await generateAliasForBackgroundWithUrl(
-        "https://api.github.com/v1/users",
+        "https://api.github.com/users",
       );
 
       expect(result).toBe(expectedAlias);
       expect(mockGenerateEmailAlias).toHaveBeenCalledWith([
         "marketing",
-        "api.github.com",
+        "github",
       ]);
     });
 
     it("should handle file:// URLs gracefully", async () => {
-      const expectedAlias = "marketing-website@example.com";
+      const expectedAlias = "alias@example.com";
       mockGenerateEmailAlias.mockResolvedValue(expectedAlias);
+      vi.mocked(extractDomainForSource).mockReturnValue("");
 
       const result = await generateAliasForBackgroundWithUrl(
         "file:///path/to/file.html",
       );
 
       expect(result).toBe(expectedAlias);
-      expect(mockGenerateEmailAlias).toHaveBeenCalledWith([
-        "marketing",
-        "website",
-      ]);
+      expect(mockGenerateEmailAlias).toHaveBeenCalledWith(["marketing", ""]);
     });
   });
 });

@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill";
 import { ApiError, generateEmailAlias } from "./api";
 import { extractDomainForSource, getDefaultLabel } from "./domain";
+import { loadSettings } from "./storage";
 
 // Interfaces for messaging between background and content scripts
 interface ShowAliasDialogMessage {
@@ -294,10 +295,48 @@ async function showAliasGenerationDialog(): Promise<void> {
   }
 
   try {
+    // Check if extension is configured before proceeding
+    let settings: { domain?: string; token?: string };
+    try {
+      settings = await loadSettings();
+    } catch (storageError) {
+      console.error("Failed to access storage:", storageError);
+      alert(
+        "Could not access extension settings. Please try refreshing the page or check extension permissions.",
+      );
+      return;
+    }
+
+    if (!settings.domain || !settings.token) {
+      alert(
+        "Email Alias Generator is not configured. Please click on the extension icon and configure your domain and secret key first.",
+      );
+      // Try to open options page
+      try {
+        await browser.runtime.sendMessage({ action: "openOptionsPage" });
+      } catch {
+        console.log("Could not open options page automatically");
+      }
+      return;
+    }
     // Fetch the HTML and CSS for the dialog from the extension's public resources.
     const [dialogHtml, dialogCss] = await Promise.all([
-      fetch(browser.runtime.getURL("dialog.html")).then((res) => res.text()),
-      fetch(browser.runtime.getURL("css/dialog.css")).then((res) => res.text()),
+      fetch(browser.runtime.getURL("dialog.html")).then((res) => {
+        if (!res.ok) {
+          throw new Error(
+            `Failed to fetch dialog.html: ${res.status} ${res.statusText}`,
+          );
+        }
+        return res.text();
+      }),
+      fetch(browser.runtime.getURL("css/dialog.css")).then((res) => {
+        if (!res.ok) {
+          throw new Error(
+            `Failed to fetch css/dialog.css: ${res.status} ${res.statusText}`,
+          );
+        }
+        return res.text();
+      }),
     ]);
 
     // Create a container for the dialog and inject the fetched HTML
@@ -535,8 +574,20 @@ async function showAliasGenerationDialog(): Promise<void> {
     }
   } catch (error) {
     console.error("Failed to create or show alias generation dialog:", error);
+    let errorMessage = "Error: Could not load the alias generation dialog.";
+
+    if (error instanceof Error) {
+      if (error.message.includes("Failed to fetch")) {
+        errorMessage +=
+          " Failed to load dialog resources. Please check if the extension is properly installed and try refreshing the page.";
+      } else {
+        errorMessage += ` Details: ${error.message}`;
+      }
+    }
+
     alert(
-      "Error: Could not load the alias generation dialog. Check extension permissions and console for more details.",
+      errorMessage +
+        " Check extension permissions and console for more details.",
     );
   }
 }
