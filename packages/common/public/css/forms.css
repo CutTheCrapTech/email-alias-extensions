@@ -119,6 +119,7 @@ textarea:focus {
   background-color: var(--background-input);
   border: 1px solid var(--border-color);
   border-radius: 6px;
+  display: flex;
 }
 
 .backup-confirmation label {
