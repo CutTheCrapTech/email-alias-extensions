@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
   backupConfirmedCheckbox.addEventListener("change", validateForm);
 
   generateKeyBtn.addEventListener("click", () => {
-    const newKey = generateSecureRandomString(32);
+    const newKey = generateSecureRandomString(8);
     tokenInput.value = newKey;
     tokenInput.type = "text"; // Show the key
     keyActions.classList.remove("hidden");

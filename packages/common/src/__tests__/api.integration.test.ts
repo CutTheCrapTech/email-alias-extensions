@@ -37,7 +37,7 @@ describe("API Module Integration with email-alias-core", () => {
       token: "a-very-secret-key-that-is-long-enough",
     };
 
-    const expectedAlias = "shop-amazon-914b754b@example.com";
+    const expectedAlias = "shop-amazon-61914b75@example.com";
 
     // Mock the settings being loaded from storage.
     vi.mocked(loadSettings).mockResolvedValue({
