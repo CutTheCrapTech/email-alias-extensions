@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Email Alias Generator",
   "version": "1.0.0",
-  "description": "Generate email aliases using a secret token and domain.",
+  "description": "Generate secure email aliases for any website on the fly using your custom domain and secret token.",
   "permissions": [
     "storage",
     "contextMenus",
@@ -25,24 +25,21 @@
     "scripts": ["background.js"]
   },
   "commands": {
-    "open-popup": {
+    "open-dialog": {
       "suggested_key": {
-        "default": "Ctrl+Shift+E",
-        "mac": "Command+Shift+E"
+        "default": "Ctrl+Shift+E"
       },
       "description": "Open Email Alias Generator popup"
     },
     "fill-current-field": {
       "suggested_key": {
-        "default": "Ctrl+Alt+E",
-        "mac": "Command+Option+E"
+        "default": "Ctrl+Shift+U"
       },
       "description": "Fill current email input field with generated alias"
     },
     "quick-generate": {
       "suggested_key": {
-        "default": "Ctrl+Alt+Q",
-        "mac": "Command+Option+Q"
+        "default": "Ctrl+Shift+Y"
       },
       "description": "Quick generate alias with default settings"
     }
@@ -66,7 +63,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "c0d19e6e-8cae-4e93-b5dc-4cf1b57805c8",
+      "id": "{c0d19e6e-8cae-4e93-b5dc-4cf1b57805c8}",
       "strict_min_version": "109.0"
     }
   }
