@@ -100,8 +100,31 @@ textarea:focus {
   align-items: center;
 }
 
+.input-with-icon-wrapper {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
 .secret-key-container input {
   flex: 1;
+  padding-right: 3rem; /* Make space for the icon */
+}
+
+#view-key-btn {
+  position: absolute;
+  right: 0.5rem; /* Padding from the right edge */
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+#view-key-btn:hover {
+  color: var(--text-primary);
 }
 
 /* Button group for form actions */
