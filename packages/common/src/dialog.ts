@@ -320,34 +320,59 @@ async function showAliasGenerationDialog(): Promise<void> {
       return;
     }
     // Fetch the HTML and CSS for the dialog from the extension's public resources.
-    const [dialogHtml, dialogCss] = await Promise.all([
-      fetch(browser.runtime.getURL("dialog.html")).then((res) => {
-        if (!res.ok) {
-          throw new Error(
-            `Failed to fetch dialog.html: ${res.status} ${res.statusText}`,
-          );
-        }
-        return res.text();
-      }),
-      fetch(browser.runtime.getURL("css/dialog.css")).then((res) => {
-        if (!res.ok) {
-          throw new Error(
-            `Failed to fetch css/dialog.css: ${res.status} ${res.statusText}`,
-          );
-        }
-        return res.text();
-      }),
-    ]);
+    const [dialogHtml, dialogCss, componentsCss, variablesCss] =
+      await Promise.all([
+        fetch(browser.runtime.getURL("dialog.html")).then((res) => {
+          if (!res.ok) {
+            throw new Error(
+              `Failed to fetch dialog.html: ${res.status} ${res.statusText}`,
+            );
+          }
+          return res.text();
+        }),
+        fetch(browser.runtime.getURL("css/dialog.css")).then((res) => {
+          if (!res.ok) {
+            throw new Error(
+              `Failed to fetch css/dialog.css: ${res.status} ${res.statusText}`,
+            );
+          }
+          return res.text();
+        }),
+        fetch(browser.runtime.getURL("css/components.css")).then((res) => {
+          if (!res.ok) {
+            throw new Error(
+              `Failed to fetch css/components.css: ${res.status} ${res.statusText}`,
+            );
+          }
+          return res.text();
+        }),
+        fetch(browser.runtime.getURL("css/variables.css")).then((res) => {
+          if (!res.ok) {
+            throw new Error(
+              `Failed to fetch css/variables.css: ${res.status} ${res.statusText}`,
+            );
+          }
+          return res.text();
+        }),
+      ]);
+
+    // Inject the fetched CSS into the document's head
+    const variablesStyle = document.createElement("style");
+    variablesStyle.textContent = variablesCss;
+    document.head.appendChild(variablesStyle);
+
+    const dialogStyle = document.createElement("style");
+    dialogStyle.textContent = dialogCss;
+    document.head.appendChild(dialogStyle);
+
+    const componentsStyle = document.createElement("style");
+    componentsStyle.textContent = componentsCss;
+    document.head.appendChild(componentsStyle);
 
     // Create a container for the dialog and inject the fetched HTML
     const dialog = document.createElement("div");
     dialog.className = "alias-dialog";
     dialog.innerHTML = dialogHtml;
-
-    // Inject the fetched CSS into the document's head
-    const style = document.createElement("style");
-    style.textContent = dialogCss;
-    document.head.appendChild(style);
     document.body.appendChild(dialog);
 
     // Auto-fill values using shared utilities
@@ -403,7 +428,9 @@ async function showAliasGenerationDialog(): Promise<void> {
     // Helper functions
     const closeDialog = () => {
       dialog.remove();
-      style.remove();
+      variablesStyle.remove();
+      dialogStyle.remove();
+      componentsStyle.remove();
     };
 
     const showError = (message: string) => {

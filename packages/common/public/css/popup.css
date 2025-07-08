@@ -6,6 +6,8 @@ body {
   min-height: 400px;
   max-height: 600px;
   overflow-y: auto;
+  /* Use card background instead of body background for popup */
+  background-color: var(--background-card);
 }
 
 /* Result box for popup */
