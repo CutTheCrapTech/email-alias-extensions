@@ -9,7 +9,7 @@ This project provides a browser extension that allows you to quickly generate un
 - **Secure Alias Generation**: Generate strong, unique email aliases directly in your browser using cryptographic algorithms.
 - **Resilient & Recoverable**: Uses the "Key Ring Model" so that losing a key is not a catastrophic event.
 - **Tracker-Free Emails**: Designed to work with services like [Cloudflare Workers](#integration-with-cloudflare-workers) to clean email trackers.
-- **Cross-Browser Support**: Works seamlessly on [Chrome](https://chromewebstore.google.com/detail/email-alias-generator/ghhkompkfhenihpidldalcocbfplkdgm) & Firefox with manifest v3.
+- **Cross-Browser Support**: Works seamlessly on [Chrome](https://chromewebstore.google.com/detail/email-alias-generator/ghhkompkfhenihpidldalcocbfplkdgm) & [Firefox](https://addons.mozilla.org/en-US/firefox/addon/email-alias-generator-hmac/) with manifest v3.
 - **Guided Setup**: An easy-to-use options page helps you generate and back up your secret key with secure random generation.
 - **Context Menu & Shortcuts**: Quickly generate aliases from any webpage or with customizable keyboard shortcuts.
 - **Toast Notifications**: Real-time feedback with success/error notifications for better user experience.
